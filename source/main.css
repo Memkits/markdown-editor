@@ -1,0 +1,11 @@
+
+@import url('module/markdown.css');
+@import url('app/editor.css');
+
+body {
+    margin: 0;
+}
+
+body, textarea {
+    font-family: Optima, Hiragino Sans GB;
+}
