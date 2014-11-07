@@ -14,6 +14,7 @@ module.exports = React.createFactory React.createClass
 
   getInitialState: ->
     content: @props.text
+    focus: no
 
   componentDidMount: ->
     node = @refs.content.getDOMNode()
@@ -25,12 +26,16 @@ module.exports = React.createFactory React.createClass
     @setState content: text
     @props.onChange text
 
+  toggleFocus: ->
+    console.log @state.focus
+    @setState focus: (not @state.focus)
+
   render: ->
     $.div className: 'app-editor',
-      $.textarea
+      unless @state.focus then $.textarea
         className: 'content'
         onChange: @onChange
         ref: 'content'
         value: @state.content
-      $.div className: 'preview',
+      $.div className: 'preview', onDoubleClick: @toggleFocus,
         markedReact @state.content
