@@ -10,6 +10,10 @@ See demo here:
 
 http://repo.tiye.me/marked-react-editor/
 
+### Develop
+
+https://github.com/mvc-works/webpack-workflow
+
 ### License
 
 MIT

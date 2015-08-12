@@ -33,3 +33,20 @@ textarea {
     background: rgb(151, 139, 157);
     color: white;
 }
+
+.preview img,
+.preview svg {
+    max-width: 400px;
+}
+
+
+.preview hr {
+    margin: 4em 0;
+    border: 2px solid #aaa;
+}
+
+.preview blockquote {
+  background-color: #eee;
+  margin: 0;
+  padding: 0px 20px;
+}
