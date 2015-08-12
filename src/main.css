@@ -7,6 +7,5 @@ body {
 }
 
 body, textarea {
-    font-family: Optima, Hiragino Sans GB;
-    /* font-weight: bold; */
+    font-family: 'Lucida Grande', 'Roboto', 'Helvetica','Source Han Sans CN', 'Wenquanyi Micro Hei', 'MicroSoft Yahei', 'Sans-serif';
 }

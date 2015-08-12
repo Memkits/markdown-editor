@@ -1,6 +1,8 @@
 
 React = require 'react'
-$ = React.DOM
+
+div = React.DOM.div
+textarea = React.DOM.textarea
 
 window.React = React
 
@@ -9,7 +11,7 @@ markedReact.setOptions
   gfm: yes
   breaks: yes
 
-module.exports = React.createFactory React.createClass
+module.exports = React.createClass
   displayName: 'app-editor'
 
   getInitialState: ->
@@ -27,15 +29,15 @@ module.exports = React.createFactory React.createClass
     @props.onChange text
 
   toggleFocus: ->
-    console.log @state.focus
     @setState focus: (not @state.focus)
 
   render: ->
-    $.div className: 'app-editor',
-      unless @state.focus then $.textarea
-        className: 'content'
-        onChange: @onChange
-        ref: 'content'
-        value: @state.content
-      $.div className: 'preview', onDoubleClick: @toggleFocus,
+    div className: 'app-editor',
+      unless @state.focus
+        textarea
+          className: 'content'
+          onChange: @onChange
+          ref: 'content'
+          value: @state.content
+      div className: 'preview', onDoubleClick: @toggleFocus,
         markedReact @state.content

@@ -31,10 +31,10 @@
   "dependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/jiyinyiyong/marked-react-editor.git"
+    "url": "https://github.com/Memkits/marked-react-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/jiyinyiyong/marked-react-editor/issues"
+    "url": "https://github.com/Memkits/marked-react-editor/issues"
   },
-  "homepage": "https://github.com/jiyinyiyong/marked-react-editor"
+  "homepage": "https://github.com/Memkits/marked-react-editor"
 }

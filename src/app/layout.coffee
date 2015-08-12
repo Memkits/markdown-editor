@@ -1,8 +1,9 @@
 
 React = require 'react'
-$ = React.DOM
 
-Editor = require './editor'
+div = React.DOM.div
+
+Editor = React.createFactory require './editor'
 
 key = 'marked-react-editor'
 
@@ -10,7 +11,7 @@ oldText = (localStorage.getItem key) or ''
 window.onbeforeunload = ->
   localStorage.setItem key, oldText
 
-module.exports = React.createFactory React.createClass
+module.exports = React.createClass
   displayName: 'app-layout'
 
   onChange: (text) ->
@@ -18,5 +19,5 @@ module.exports = React.createFactory React.createClass
 
   render: ->
 
-    $.div className: 'app-layout',
+    div className: 'app-layout',
       Editor text: oldText, onChange: @onChange

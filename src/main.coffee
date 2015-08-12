@@ -1,7 +1,6 @@
 
 React = require 'react'
 
-Layout = require './app/layout'
-Editor = require './app/editor'
+Layout = React.createFactory require './app/layout'
 
 React.render Layout(), document.body
