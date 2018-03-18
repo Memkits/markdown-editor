@@ -8,11 +8,12 @@
             [cljs.reader :refer [read-string]]))
 
 (def base-info
-  {:title "Calcit",
+  {:title "Markdown Editor",
    :icon "http://cdn.tiye.me/logo/mvc-works.png",
    :ssr nil,
    :inline-html nil,
-   :inline-styles [(slurp "./entry/main.css")]})
+   :inline-styles [(slurp "./node_modules/highlight.js/styles/github.css")
+                   (slurp "./entry/main.css")]})
 
 (defn dev-page []
   (make-page

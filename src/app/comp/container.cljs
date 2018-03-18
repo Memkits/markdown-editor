@@ -9,7 +9,8 @@
             [respo.comp.space :refer [=<]]
             [reel.comp.reel :refer [comp-reel]]
             [respo-md.comp.md :refer [comp-md comp-md-block]]
-            [respo-ui.comp.icon :refer [comp-icon]]))
+            [respo-ui.comp.icon :refer [comp-icon]]
+            ["highlight.js" :as hljs]))
 
 (defcomp
  comp-container
@@ -39,7 +40,14 @@
                :overflow :auto})}
      (comp-md-block
       (:content store)
-      {:css "\n\n.md-p {\nmargin: 16px 0;\nline-height: 1.6em;\n}\n\n.md-p code {\nbackground-color: #eee;\npadding: 0 8px;\n}\n\n.md-code-block {\nbackground-color: #f6f6f6;\npadding: 8px;\nline-height: 1.4em;\n}\n"}))
+      {:css "\n\n.md-p {\nmargin: 16px 0;\nline-height: 1.6em;\n}\n\n.md-p code {\nbackground-color: #eee;\npadding: 0 8px;\n}\n\n.md-code-block {\nbackground-color: #f6f6f6;\npadding: 8px;\nline-height: 1.6em;\nfont-size: 12px;\n}\n",
+       :style {:font-size 16},
+       :highlight (fn [code lang]
+         (case lang
+           "clojure" (.-value (.highlight hljs "clojure" code))
+           "clj" (.-value (.highlight hljs "clojure" code))
+           "bash" (.-value (.highlight hljs "bash" code))
+           code))}))
     (div
      {:style (merge ui/column-parted {:width 40, :border-left "1px solid #ddd"})}
      (div
