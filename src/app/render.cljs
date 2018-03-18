@@ -9,7 +9,7 @@
 
 (def base-info
   {:title "Markdown Editor",
-   :icon "http://cdn.tiye.me/logo/mvc-works.png",
+   :icon "http://cdn.tiye.me/logo/markdown-editor.png",
    :ssr nil,
    :inline-html nil,
    :inline-styles [(slurp "./node_modules/highlight.js/styles/github.css")

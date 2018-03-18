@@ -40,7 +40,7 @@
                :overflow :auto})}
      (comp-md-block
       (:content store)
-      {:css "\n\n.md-p {\nmargin: 16px 0;\nline-height: 1.6em;\n}\n\n.md-p code {\nbackground-color: #eee;\npadding: 0 8px;\n}\n\n.md-code-block {\nbackground-color: #f6f6f6;\npadding: 8px;\nline-height: 1.6em;\nfont-size: 12px;\n}\n",
+      {:css "\n\n.md-p {\nmargin: 16px 0;\nline-height: 1.6em;\n}\n\n.md-p code {\nbackground-color: #eee;\npadding: 0 8px;\n}\n\n.md-code-block {\nbackground-color: #f6f6f6;\npadding: 8px;\nline-height: 1.6em;\nfont-size: 12px;\n}\nt",
        :style {:font-size 16},
        :highlight (fn [code lang]
          (case lang
