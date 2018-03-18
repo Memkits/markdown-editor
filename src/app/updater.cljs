@@ -6,5 +6,5 @@
     :states (update store :states (mutate op-data))
     :content (assoc store :content op-data)
     :hydrate-storage op-data
-    :page (assoc store :page op-data)
+    :toggle (update store :preview? not)
     store))

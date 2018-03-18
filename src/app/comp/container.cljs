@@ -12,23 +12,13 @@
             [respo-ui.comp.icon :refer [comp-icon]]))
 
 (defcomp
- comp-entry
- (page icon-name selected?)
- (div
-  {:style (merge
-           ui/center
-           {:width 40, :height 40, :color (hsl 0 0 60), :cursor :pointer}
-           (if selected? {:color :black})),
-   :on-click (action-> :page page)}
-  (comp-icon icon-name)))
-
-(defcomp
  comp-container
  (reel)
- (let [store (:store reel), states (:states store), page (:page store)]
+ (let [store (:store reel), states (:states store), preview? (:preview? store)]
+   (println preview?)
    (div
     {:style (merge ui/global ui/row ui/fullscreen)}
-    (if (= page :home)
+    (if (not preview?)
       (textarea
        {:style (merge
                 ui/textarea
@@ -44,7 +34,9 @@
     (div
      {:style (merge
               ui/flex
-              {:padding 16, :flex-shrink 0, :overflow :auto, :padding-bottom 240})}
+              {:padding (if preview? "40px 240px 240px 240px" "16px 16px 240px 16px"),
+               :flex-shrink 0,
+               :overflow :auto})}
      (comp-md-block
       (:content store)
       {:css "\n\n.md-p {\nmargin: 16px 0;\nline-height: 1.6em;\n}\n\n.md-p code {\nbackground-color: #eee;\npadding: 0 8px;\n}\n\n.md-code-block {\nbackground-color: #f6f6f6;\npadding: 8px;\nline-height: 1.4em;\n}\n"}))
@@ -52,8 +44,10 @@
      {:style (merge ui/column-parted {:width 40, :border-left "1px solid #ddd"})}
      (div
       {:style ui/column}
-      (comp-entry :home "android-document" (= page :home))
-      (comp-entry :preview "android-desktop" (= page :preview)))
+      (div
+       {:style (merge ui/center {:width 40, :height 40, :cursor :pointer}),
+        :on-click (action-> :toggle nil)}
+       (comp-icon "android-desktop")))
      (div
       {:style (merge ui/center {:width 40, :height 40})}
       (a
