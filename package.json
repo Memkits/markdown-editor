@@ -1,40 +1,25 @@
 {
-  "name": "marked-react-editor",
-  "version": "0.0.1",
-  "description": "Markdown editor",
-  "main": "main.js",
+  "name": "calcit-workflow",
+  "version": "0.1.0",
+  "description": "ClojureScript workflow using Calcit Editor",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "shadow-cljs watch browser",
+    "serve": "http-server dist -s",
+    "repl": "rlwrap shadow-cljs clj-repl",
+    "build": "shadow-cljs clj-run build.main/build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mvc-works/calcit-workflow.git"
   },
   "author": "jiyinyiyong",
   "license": "MIT",
-  "keywords": [
-    "markdown",
-    "editor"
-  ],
   "devDependencies": {
-    "cirru-script": "^0.2.3",
-    "cirru-script-loader": "0.1.0",
-    "coffee-loader": "^0.7.2",
-    "coffee-script": "^1.9.3",
-    "del": "^1.1.1",
-    "gulp": "^3.8.11",
-    "gulp-cirru-script": "^0.1.1",
-    "marked": "git://github.com/spicyj/marked-react",
-    "react": "0.13.x",
-    "rsyncwrapper": "^0.4.2",
-    "run-sequence": "^1.0.2",
-    "stir-template": "^0.1.4",
-    "webpack": "^1.8.5",
-    "webpack-dev-server": "^1.8.0"
+    "http-server": "^0.11.1",
+    "shadow-cljs": "^2.2.14"
   },
-  "dependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Memkits/marked-react-editor.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Memkits/marked-react-editor/issues"
-  },
-  "homepage": "https://github.com/Memkits/marked-react-editor"
+  "dependencies": {
+    "shortid": "^2.2.8"
+  }
 }

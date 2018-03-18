@@ -1,18 +1,14 @@
 
-Marked React Editor
+Very tiny Markdown Editor
 ------
 
-An dead simple Marked editor based on marked-react:
+An dead simple Marked editor based on repso-markdown:
 
-https://github.com/spicyj/marked-react
-
-See demo here:
-
-http://repo.tiye.me/marked-react-editor/
+Demo http://repo.memkits.org/markdown-editor
 
 ### Develop
 
-https://github.com/mvc-works/webpack-workflow
+https://github.com/mvc-works/calcit-workflow
 
 ### License
 
