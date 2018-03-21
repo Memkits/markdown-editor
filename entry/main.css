@@ -28,3 +28,25 @@ body * {
 ::-webkit-resizer{
   background-color:transparent;
 }
+
+.md-p {
+margin: 16px 0;
+line-height: 1.6em;
+}
+
+.md-p code {
+background-color: #eee;
+padding: 0 8px;
+}
+
+.md-code-block {
+background-color: #f6f6f6;
+padding: 8px;
+line-height: 1.6em;
+font-size: 12px;
+}
+
+.md-block img {
+max-width: 100%;
+max-height: 80vh;
+}

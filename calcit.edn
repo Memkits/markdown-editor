@@ -438,7 +438,7 @@
                   :type :expr, :by "root", :at 1521390688479, :id "B1fuP4f2Yf"
                   :data {
                    "T" {:type :leaf, :by "root", :at 1521390689377, :text ":css", :id "BkbuDVGhtf"}
-                   "j" {:type :leaf, :by "root", :at 1521392714204, :text "|\n\n.md-p {\nmargin: 16px 0;\nline-height: 1.6em;\n}\n\n.md-p code {\nbackground-color: #eee;\npadding: 0 8px;\n}\n\n.md-code-block {\nbackground-color: #f6f6f6;\npadding: 8px;\nline-height: 1.6em;\nfont-size: 12px;\n}\nt", :id "ryblY4z3FM"}
+                   "j" {:type :leaf, :by "root", :at 1521651577725, :text "|", :id "ryblY4z3FM"}
                   }
                  }
                  "n" {
