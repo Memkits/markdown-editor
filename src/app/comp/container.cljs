@@ -10,7 +10,8 @@
             [reel.comp.reel :refer [comp-reel]]
             [respo-md.comp.md :refer [comp-md comp-md-block]]
             [respo-ui.comp.icon :refer [comp-icon]]
-            ["highlight.js" :as hljs]))
+            ["highlight.js" :as hljs]
+            ["escape-html" :as escape-html]))
 
 (def supported-langs
   {"clojure" "clojure",
@@ -59,7 +60,7 @@
        :highlight (fn [code lang]
          (if (contains? supported-langs lang)
            (.-value (.highlight hljs (get supported-langs lang) code))
-           code))}))
+           (escape-html code)))}))
     (div
      {:style (merge ui/column-parted {:width 40, :border-left "1px solid #ddd"})}
      (div

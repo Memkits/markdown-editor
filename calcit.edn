@@ -145,6 +145,15 @@
           "v" {:type :leaf, :by "root", :at 1521392346784, :text "hljs", :id "rkgGJoMnKz"}
          }
         }
+        "yv" {
+         :type :expr, :by "root", :at 1521653310954, :id "H1gvHLMl9f"
+         :data {
+          "D" {:type :leaf, :by "root", :at 1521653314092, :text "[]", :id "H1KHLzgqM"}
+          "T" {:type :leaf, :by "root", :at 1521653312092, :text "\"escape-html", :id "H1gvHLMl9fleaf"}
+          "j" {:type :leaf, :by "root", :at 1521653314900, :text ":as", :id "Sy-cSUGg5z"}
+          "r" {:type :leaf, :by "root", :at 1521653315332, :text "escape-html", :id "HyMoBIMg9z"}
+         }
+        }
        }
       }
      }
@@ -509,7 +518,13 @@
                          }
                         }
                        }
-                       "R" {:type :leaf, :by "root", :at 1521652518106, :text "code", :id "H10Q7zgcM"}
+                       "R" {
+                        :type :expr, :by "root", :at 1521653308258, :id "HJeVB8MgqM"
+                        :data {
+                         "D" {:type :leaf, :by "root", :at 1521653309036, :text "escape-html", :id "ryBHLMlcf"}
+                         "T" {:type :leaf, :by "root", :at 1521652518106, :text "code", :id "H10Q7zgcM"}
+                        }
+                       }
                       }
                      }
                     }
