@@ -10,6 +10,11 @@
             [cljs.reader :refer [read-string]]
             ["highlight.js" :as hljs]
             ["highlight.js/lib/languages/clojure" :as clojure-lang]
+            ["highlight.js/lib/languages/coffeescript" :as coffeescript-lang]
+            ["highlight.js/lib/languages/javascript" :as javascript-lang]
+            ["highlight.js/lib/languages/css" :as css-lang]
+            ["highlight.js/lib/languages/xml" :as xml-lang]
+            ["highlight.js/lib/languages/typescript" :as typescript-lang]
             ["highlight.js/lib/languages/bash" :as bash-lang]))
 
 (defonce *reel
@@ -29,6 +34,11 @@
 (defn main! []
   (.registerLanguage hljs "clojure" clojure-lang)
   (.registerLanguage hljs "bash" bash-lang)
+  (.registerLanguage hljs "coffeescript" coffeescript-lang)
+  (.registerLanguage hljs "javascript" javascript-lang)
+  (.registerLanguage hljs "css" css-lang)
+  (.registerLanguage hljs "xml" xml-lang)
+  (.registerLanguage hljs "typescript" typescript-lang)
   (if ssr? (render-app! realize-ssr!))
   (render-app! render!)
   (add-watch *reel :changes (fn [] (render-app! render!)))

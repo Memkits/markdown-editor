@@ -12,6 +12,20 @@
             [respo-ui.comp.icon :refer [comp-icon]]
             ["highlight.js" :as hljs]))
 
+(def supported-langs
+  {"clojure" "clojure",
+   "clj" "clojure",
+   "bash" "bash",
+   "js" "javascript",
+   "javascript" "javascript",
+   "html" "xml",
+   "xml" "xml",
+   "css" "css",
+   "coffeescript" "coffeescript",
+   "coffee" "coffeescript",
+   "ts" "typescript",
+   "typescript" "typescript"})
+
 (defcomp
  comp-container
  (reel)
@@ -43,10 +57,8 @@
       {:css "",
        :style {:font-size 16},
        :highlight (fn [code lang]
-         (case lang
-           "clojure" (.-value (.highlight hljs "clojure" code))
-           "clj" (.-value (.highlight hljs "clojure" code))
-           "bash" (.-value (.highlight hljs "bash" code))
+         (if (contains? supported-langs lang)
+           (.-value (.highlight hljs (get supported-langs lang) code))
            code))}))
     (div
      {:style (merge ui/column-parted {:width 40, :border-left "1px solid #ddd"})}
