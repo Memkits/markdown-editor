@@ -2,16 +2,15 @@
 (ns app.comp.container
   (:require [hsl.core :refer [hsl]]
             [respo-ui.core :as ui]
-            [respo.macros
+            [respo.core
              :refer
              [defcomp cursor-> action-> mutation-> <> div button textarea span a]]
-            [verbosely.core :refer [verbosely!]]
             [respo.comp.space :refer [=<]]
             [reel.comp.reel :refer [comp-reel]]
             [respo-md.comp.md :refer [comp-md comp-md-block]]
-            [respo-ui.comp.icon :refer [comp-icon]]
             ["highlight.js" :as hljs]
-            ["escape-html" :as escape-html]))
+            ["escape-html" :as escape-html]
+            [feather.core :refer [comp-i]]))
 
 (def supported-langs
   {"clojure" "clojure",
@@ -31,9 +30,8 @@
  comp-container
  (reel)
  (let [store (:store reel), states (:states store), preview? (:preview? store)]
-   (println preview?)
    (div
-    {:style (merge ui/global ui/row ui/fullscreen)}
+    {:style (merge ui/global ui/row ui/fullscreen {:overflow :hidden})}
     (if (not preview?)
       (textarea
        {:style (merge
@@ -68,10 +66,10 @@
       (div
        {:style (merge ui/center {:width 40, :height 40, :cursor :pointer}),
         :on-click (action-> :toggle nil)}
-       (comp-icon "android-desktop")))
+       (comp-i :film 14 (hsl 200 80 80))))
      (div
       {:style (merge ui/center {:width 40, :height 40})}
       (a
        {:href "https://github.com/Memkits/markdown-editor", :target "_blank"}
-       (comp-icon :social-github))))
+       (comp-i :github 14 (hsl 200 80 80)))))
     (cursor-> :reel comp-reel states reel {}))))

@@ -1,11 +1,12 @@
 
 body {
   margin: 0;
-  font-display: optional;
+  overscroll-behavior-y: none;
 }
 
 body * {
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 ::-webkit-scrollbar {
@@ -44,6 +45,7 @@ background-color: #f6f6f6;
 padding: 8px;
 line-height: 1.6em;
 font-size: 12px;
+overflow: auto;
 }
 
 .md-block img {

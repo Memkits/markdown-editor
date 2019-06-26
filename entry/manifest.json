@@ -1,9 +1,9 @@
 {
-  "short_name": "Calcit Workflow",
-  "name": "Calcit Workflow",
+  "short_name": "Markdown Editor",
+  "name": "Markdown Editor",
   "icons": [
     {
-      "src": "http://cdn.tiye.me/logo/mvc-works.png",
+      "src": "http://cdn.tiye.me/logo/memkits.png",
       "sizes": "320x320"
     }
   ],
