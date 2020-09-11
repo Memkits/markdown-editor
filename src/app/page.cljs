@@ -23,7 +23,7 @@
    (merge
     base-info
     {:styles [(<< "http://~(get-ip!):8100/main.css") "/entry/main.css"],
-     :scripts ["/client.js"],
+     :scripts [{:src "/client.js"}],
      :inline-styles []})))
 
 (defn prod-page []
@@ -37,7 +37,7 @@
      (merge
       base-info
       {:styles [(:release-ui config/site)],
-       :scripts (map #(-> % :output-name prefix-cdn) assets),
+       :scripts (map (fn [x] {:src (-> x :output-name prefix-cdn)}) assets),
        :ssr "respo-ssr",
        :inline-styles [(slurp "./node_modules/highlight.js/styles/github.css")
                        (slurp "./entry/main.css")]}))))

@@ -19,13 +19,13 @@
   "author": "jiyinyiyong",
   "license": "MIT",
   "devDependencies": {
-    "http-server": "^0.11.1",
-    "shadow-cljs": "^2.8.39"
+    "http-server": "^0.12.3",
+    "shadow-cljs": "^2.11.3"
   },
   "dependencies": {
-    "feather-icons": "^4.21.0",
     "escape-html": "^1.0.3",
-    "highlight.js": "^9.15.8",
-    "shortid": "^2.2.14"
+    "feather-icons": "^4.28.0",
+    "highlight.js": "^10.2.0",
+    "shortid": "^2.2.15"
   }
 }
