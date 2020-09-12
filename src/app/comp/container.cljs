@@ -2,9 +2,7 @@
 (ns app.comp.container
   (:require [hsl.core :refer [hsl]]
             [respo-ui.core :as ui]
-            [respo.core
-             :refer
-             [defcomp cursor-> action-> mutation-> <> div button textarea span a]]
+            [respo.core :refer [defcomp >> <> div button textarea span a]]
             [respo.comp.space :refer [=<]]
             [reel.comp.reel :refer [comp-reel]]
             [respo-md.comp.md :refer [comp-md comp-md-block]]
@@ -32,19 +30,6 @@
  (let [store (:store reel), states (:states store), preview? (:preview? store)]
    (div
     {:style (merge ui/global ui/row ui/fullscreen {:overflow :hidden})}
-    (if (not preview?)
-      (textarea
-       {:style (merge
-                ui/textarea
-                ui/flex
-                {:resize :none,
-                 :flex-shrink 0,
-                 :font-family ui/font-code,
-                 :padding-bottom 240,
-                 :padding 16}),
-        :value (:content store),
-        :placeholder "Markdown syntax supported~",
-        :on-input (action-> :content (:value %e))}))
     (div
      {:style (merge
               ui/flex
@@ -59,17 +44,36 @@
          (if (contains? supported-langs lang)
            (.-value (.highlight hljs (get supported-langs lang) code))
            (escape-html code)))}))
+    (if (not preview?)
+      (textarea
+       {:style (merge
+                ui/textarea
+                ui/flex
+                {:resize :none,
+                 :flex-shrink 0,
+                 :font-family ui/font-code,
+                 :padding-bottom 240,
+                 :padding 16,
+                 :border-width "0 0 0 1px",
+                 :border-color (hsl 0 0 95),
+                 :border-style :solid,
+                 :background-color (hsl 0 0 98)}),
+        :value (:content store),
+        :placeholder "Markdown syntax supported~",
+        :on-input (fn [e d!] (d! :content (:value e)))}))
     (div
-     {:style (merge ui/column-parted {:width 40, :border-left "1px solid #ddd"})}
+     {}
      (div
-      {:style ui/column}
-      (div
-       {:style (merge ui/center {:width 40, :height 40, :cursor :pointer}),
-        :on-click (action-> :toggle nil)}
-       (comp-i :film 14 (hsl 200 80 80))))
+      {:style (merge
+               ui/center
+               {:width 40, :height 40, :cursor :pointer, :position :fixed, :top 0, :right 0}),
+       :on-click (fn [e d!] (d! :toggle nil))}
+      (comp-i :film 14 (hsl 200 80 80)))
      (div
-      {:style (merge ui/center {:width 40, :height 40})}
+      {:style (merge
+               ui/center
+               {:width 40, :height 40, :position :fixed, :right 0, :bottom 0})}
       (a
        {:href "https://github.com/Memkits/markdown-editor", :target "_blank"}
        (comp-i :github 14 (hsl 200 80 80)))))
-    (cursor-> :reel comp-reel states reel {}))))
+    (comp-reel (>> states :reel) reel {}))))
