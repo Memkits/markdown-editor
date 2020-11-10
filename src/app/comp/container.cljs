@@ -60,7 +60,8 @@
                  :background-color (hsl 0 0 98)}),
         :value (:content store),
         :placeholder "Markdown syntax supported~",
-        :on-input (fn [e d!] (d! :content (:value e)))}))
+        :on-input (fn [e d!] (d! :content (:value e))),
+        :autofocus true}))
     (div
      {}
      (div
