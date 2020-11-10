@@ -28,6 +28,9 @@
 
 (def mount-target (.querySelector js/document ".app"))
 
+(defn on-window-keydown [event]
+  (when (and (= "e" (.-key event)) (.-metaKey event)) (dispatch! :toggle nil)))
+
 (defn persist-storage! []
   (.setItem js/localStorage (:storage-key config/site) (pr-str (:store @*reel))))
 
@@ -50,6 +53,7 @@
   (add-watch *reel :changes (fn [] (render-app! render!)))
   (listen-devtools! "a" dispatch!)
   (.addEventListener js/window "beforeunload" persist-storage!)
+  (.addEventListener js/window "keydown" on-window-keydown)
   (repeat! 60 persist-storage!)
   (let [raw (.getItem js/localStorage (:storage-key config/site))]
     (if (some? raw) (do (dispatch! :hydrate-storage (read-string raw)))))
