@@ -1,21 +1,10 @@
 
 {} (:package |app)
-  :configs $ {} (:init-fn |app.main/main!) (:reload-fn |app.main/reload!)
+  :configs $ {} (:init-fn |app.main/main!) (:reload-fn |app.main/reload!) (:version |0.0.1)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-ui.calcit/ |respo-markdown.calcit/ |reel.calcit/ |respo-feather.calcit/
-    :version |0.0.1
+  :entries $ {}
   :files $ {}
     |app.comp.container $ {}
-      :ns $ quote
-        ns app.comp.container $ :require
-          [] respo-ui.core :refer $ [] hsl
-          [] respo-ui.core :as ui
-          [] respo.core :refer $ [] defcomp >> <> div button textarea span a
-          [] respo.comp.space :refer $ [] =<
-          [] reel.comp.reel :refer $ [] comp-reel
-          [] respo-md.comp.md :refer $ [] comp-md comp-md-block
-          [] "\"highlight.js" :as hljs
-          [] "\"escape-html" :default escape-html
-          [] feather.core :refer $ [] comp-i
       :defs $ {}
         |comp-container $ quote
           defcomp comp-container (reel)
@@ -67,53 +56,55 @@
                 comp-reel (>> states :reel) reel $ {}
         |supported-langs $ quote
           def supported-langs $ {} ("\"clojure" "\"clojure") ("\"clj" "\"clojure") ("\"bash" "\"bash") ("\"js" "\"javascript") ("\"javascript" "\"javascript") ("\"html" "\"xml") ("\"xml" "\"xml") ("\"css" "\"css") ("\"coffeescript" "\"coffeescript") ("\"coffee" "\"coffeescript") ("\"ts" "\"typescript") ("\"typescript" "\"typescript")
-    |app.schema $ {}
-      :ns $ quote (ns app.schema)
-      :defs $ {}
-        |store $ quote
-          def store $ {}
-            :states $ {}
-            :content |
-            :preview? false
-    |app.updater $ {}
       :ns $ quote
-        ns app.updater $ :require
-          [] respo.cursor :refer $ [] update-states
-      :defs $ {}
-        |updater $ quote
-          defn updater (store op op-data op-id op-time)
-            case-default op
-              do (println "\"Unknown op:" op) store
-              :states $ update-states store op-data
-              :content $ assoc store :content op-data
-              :hydrate-storage op-data
-              :toggle $ update store :preview? not
-    |app.main $ {}
-      :ns $ quote
-        ns app.main $ :require
-          [] respo.core :refer $ [] render! clear-cache! realize-ssr!
-          [] app.comp.container :refer $ [] comp-container
-          [] app.updater :refer $ [] updater
-          [] app.schema :as schema
-          [] reel.util :refer $ [] listen-devtools!
-          [] reel.core :refer $ [] reel-updater refresh-reel
-          [] reel.schema :as reel-schema
-          [] cljs.reader :refer $ [] read-string
-          [] app.config :as config
+        ns app.comp.container $ :require
+          [] respo-ui.core :refer $ [] hsl
+          [] respo-ui.core :as ui
+          [] respo.core :refer $ [] defcomp >> <> div button textarea span a
+          [] respo.comp.space :refer $ [] =<
+          [] reel.comp.reel :refer $ [] comp-reel
+          [] respo-md.comp.md :refer $ [] comp-md comp-md-block
           [] "\"highlight.js" :as hljs
-          [] "\"highlight.js/lib/languages/clojure" :default clojure-lang
-          [] "\"highlight.js/lib/languages/coffeescript" :default coffeescript-lang
-          [] "\"highlight.js/lib/languages/javascript" :default javascript-lang
-          [] "\"highlight.js/lib/languages/css" :default css-lang
-          [] "\"highlight.js/lib/languages/xml" :default xml-lang
-          [] "\"highlight.js/lib/languages/typescript" :default typescript-lang
-          [] "\"highlight.js/lib/languages/bash" :default bash-lang
-          "\"./calcit.build-errors" :default build-errors
-          "\"bottom-tip" :default hud!
+          [] "\"escape-html" :default escape-html
+          [] feather.core :refer $ [] comp-i
+    |app.config $ {}
       :defs $ {}
-        |render-app! $ quote
-          defn render-app! (renderer)
-            renderer mount-target (comp-container @*reel) dispatch!
+        |dev? $ quote
+          def dev? $ = "\"dev" (get-env "\"mode" "\"release")
+        |site $ quote
+          def site $ {} (:dev-ui "\"http://localhost:8100/main-fonts.css") (:release-ui "\"http://cdn.tiye.me/favored-fonts/main-fonts.css") (:cdn-url "\"http://cdn.tiye.me/markdown-editor/") (:title "\"Markdown Editor") (:icon "\"http://cdn.tiye.me/logo/markdown-editor.png") (:storage-key "\"markdown-editor")
+      :ns $ quote (ns app.config)
+    |app.main $ {}
+      :defs $ {}
+        |*reel $ quote
+          defatom *reel $ -> reel-schema/reel (assoc :base schema/store) (assoc :store schema/store)
+        |dispatch! $ quote
+          defn dispatch! (op op-data)
+            when config/dev? $ println "\"Dispatch:" op
+            reset! *reel $ reel-updater updater @*reel op op-data
+        |main! $ quote
+          defn main! ()
+            println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
+            .!registerLanguage hljs |clojure clojure-lang
+            .!registerLanguage hljs |bash bash-lang
+            .!registerLanguage hljs |coffeescript coffeescript-lang
+            .!registerLanguage hljs |javascript javascript-lang
+            .!registerLanguage hljs |css css-lang
+            .!registerLanguage hljs |xml xml-lang
+            .!registerLanguage hljs |typescript typescript-lang
+            render-app!
+            add-watch *reel :changes $ fn (r p) (render-app!)
+            listen-devtools! |a dispatch!
+            js/window.addEventListener "\"beforeunload" persist-storage!
+            js/window.addEventListener "\"keydown" on-window-keydown
+            flipped js/setInterval 60000 persist-storage!
+            let
+                raw $ js/localStorage.getItem (:storage-key config/site)
+              if (some? raw)
+                do $ dispatch! :hydrate-storage (parse-cirru-edn raw)
+            println "|App started."
+        |mount-target $ quote
+          def mount-target $ .querySelector js/document |.app
         |on-window-keydown $ quote
           defn on-window-keydown (event)
             when
@@ -125,35 +116,6 @@
           defn persist-storage! (? e)
             js/localStorage.setItem (:storage-key config/site)
               format-cirru-edn $ :store @*reel
-        |mount-target $ quote
-          def mount-target $ .querySelector js/document |.app
-        |*reel $ quote
-          defatom *reel $ -> reel-schema/reel (assoc :base schema/store) (assoc :store schema/store)
-        |main! $ quote
-          defn main! ()
-            println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
-            hljs/registerLanguage |clojure clojure-lang
-            hljs/registerLanguage |bash bash-lang
-            hljs/registerLanguage |coffeescript coffeescript-lang
-            hljs/registerLanguage |javascript javascript-lang
-            hljs/registerLanguage |css css-lang
-            hljs/registerLanguage |xml xml-lang
-            hljs/registerLanguage |typescript typescript-lang
-            render-app! render!
-            add-watch *reel :changes $ fn (r p) (render-app! render!)
-            listen-devtools! |a dispatch!
-            .addEventListener js/window "\"beforeunload" persist-storage!
-            .addEventListener js/window "\"keydown" on-window-keydown
-            repeat! 60 persist-storage!
-            let
-                raw $ .getItem js/localStorage (:storage-key config/site)
-              if (some? raw)
-                do $ dispatch! :hydrate-storage (parse-cirru-edn raw)
-            println "|App started."
-        |dispatch! $ quote
-          defn dispatch! (op op-data)
-            when config/dev? $ println "\"Dispatch:" op
-            reset! *reel $ reel-updater updater @*reel op op-data
         |reload! $ quote
           defn reload! () $ if (nil? build-errors)
             do (remove-watch *reel :changes) (clear-cache!)
@@ -161,16 +123,47 @@
               reset! *reel $ refresh-reel @*reel schema/store updater
               hud! "\"ok~" "\"Ok"
             hud! "\"error" build-errors
-        |repeat! $ quote
-          defn repeat! (duration cb)
-            js/setTimeout
-              fn () (cb)
-                repeat! (* 1000 duration) cb
-              * 1000 duration
-    |app.config $ {}
-      :ns $ quote (ns app.config)
+        |render-app! $ quote
+          defn render-app! () $ render! mount-target (comp-container @*reel) dispatch!
+      :ns $ quote
+        ns app.main $ :require
+          [] respo.core :refer $ [] render! clear-cache! realize-ssr!
+          [] app.comp.container :refer $ [] comp-container
+          [] app.updater :refer $ [] updater
+          [] app.schema :as schema
+          [] reel.util :refer $ [] listen-devtools!
+          [] reel.core :refer $ [] reel-updater refresh-reel
+          [] reel.schema :as reel-schema
+          [] cljs.reader :refer $ [] read-string
+          [] app.config :as config
+          [] "\"highlight.js" :default hljs
+          [] "\"highlight.js/lib/languages/clojure" :default clojure-lang
+          [] "\"highlight.js/lib/languages/coffeescript" :default coffeescript-lang
+          [] "\"highlight.js/lib/languages/javascript" :default javascript-lang
+          [] "\"highlight.js/lib/languages/css" :default css-lang
+          [] "\"highlight.js/lib/languages/xml" :default xml-lang
+          [] "\"highlight.js/lib/languages/typescript" :default typescript-lang
+          [] "\"highlight.js/lib/languages/bash" :default bash-lang
+          "\"./calcit.build-errors" :default build-errors
+          "\"bottom-tip" :default hud!
+    |app.schema $ {}
       :defs $ {}
-        |dev? $ quote
-          def dev? $ = "\"dev" (get-env "\"mode")
-        |site $ quote
-          def site $ {} (:dev-ui "\"http://localhost:8100/main-fonts.css") (:release-ui "\"http://cdn.tiye.me/favored-fonts/main-fonts.css") (:cdn-url "\"http://cdn.tiye.me/markdown-editor/") (:title "\"Markdown Editor") (:icon "\"http://cdn.tiye.me/logo/markdown-editor.png") (:storage-key "\"markdown-editor")
+        |store $ quote
+          def store $ {}
+            :states $ {}
+            :content |
+            :preview? false
+      :ns $ quote (ns app.schema)
+    |app.updater $ {}
+      :defs $ {}
+        |updater $ quote
+          defn updater (store op op-data op-id op-time)
+            case-default op
+              do (println "\"Unknown op:" op) store
+              :states $ update-states store op-data
+              :content $ assoc store :content op-data
+              :hydrate-storage op-data
+              :toggle $ update store :preview? not
+      :ns $ quote
+        ns app.updater $ :require
+          [] respo.cursor :refer $ [] update-states
