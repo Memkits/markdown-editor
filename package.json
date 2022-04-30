@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@calcit/procs": "^0.5.41",
+    "@memkits/azure-speech-util": "^0.0.2",
     "escape-html": "^1.0.3",
     "feather-icons": "^4.29.0",
     "highlight.js": "^11.5.1",
