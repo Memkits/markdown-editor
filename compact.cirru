@@ -13,14 +13,14 @@
                 states $ :states store
                 preview? $ :preview? store
               div
-                {} $ :style
-                  merge ui/global ui/row ui/fullscreen $ {} (:overflow :hidden)
+                {} $ :class-name css-container
                 div
-                  {} $ :style
-                    merge ui/flex $ {}
-                      :padding $ if preview? "|40px 240px 240px 240px" "|16px 16px 240px 16px"
-                      :flex-shrink 0
-                      :overflow :auto
+                  {} (:id "\"article")
+                    :style $ merge ui/flex
+                      {}
+                        :padding $ if preview? "|40px 240px 240px 240px" "|16px 16px 240px 16px"
+                        :flex-shrink 0
+                        :overflow :auto
                   comp-md-block (:content store)
                     {} (:css |)
                       :style $ {} (:font-size 16)
@@ -29,12 +29,7 @@
                           .-value $ hljs/highlight (get supported-langs lang) code
                           escape-html code
                 if (not preview?)
-                  textarea $ {}
-                    :style $ merge ui/textarea ui/flex
-                      {} (:resize :none) (:flex-shrink 0) (:font-family ui/font-code) (:padding-bottom 240) (:padding 16) (:border-width "\"0 0 0 1px")
-                        :border-color $ hsl 0 0 95
-                        :border-style :solid
-                        :background-color $ hsl 0 0 98
+                  textarea $ {} (:class-name css-textbox)
                     :value $ :content store
                     :placeholder "|Markdown syntax supported~"
                     :on-input $ fn (e d!)
@@ -42,11 +37,16 @@
                     :autofocus true
                 div ({})
                   div
-                    {}
-                      :style $ merge ui/center
-                        {} (:width 40) (:height 40) (:cursor :pointer) (:position :fixed) (:top 0) (:right 0)
-                      :on-click $ fn (e d!) (d! :toggle nil)
-                    comp-i :film 14 $ hsl 200 80 80
+                    {} $ :style
+                      {} (:position :fixed) (:top 0) (:right 0)
+                    div
+                      {} (:class-name css-icon)
+                        :on-click $ fn (e d!) (d! :toggle nil)
+                      comp-i :film 14 $ hsl 200 80 80
+                    div
+                      {} (:class-name css-icon)
+                        :on-click $ fn (e d!) (read-from-dom!)
+                      comp-i :volume-2 14 $ hsl 200 80 80
                   div
                     {} $ :style
                       merge ui/center $ {} (:width 40) (:height 40) (:position :fixed) (:right 0) (:bottom 0)
@@ -54,6 +54,42 @@
                       {} (:href "\"https://github.com/Memkits/markdown-editor") (:target "\"_blank")
                       comp-i :github 14 $ hsl 200 80 80
                 comp-reel (>> states :reel) reel $ {}
+        |css-container $ quote
+          defstyle css-container $ {}
+            "\"$0" $ merge ui/global ui/row ui/fullscreen
+              {} $ :overflow :hidden
+        |css-icon $ quote
+          defstyle css-icon $ {}
+            "\"$0" $ merge ui/center
+              {} (:width 40) (:height 40) (:cursor :pointer)
+        |css-textbox $ quote
+          defstyle css-textbox $ {}
+            "\"$0" $ merge ui/textarea ui/flex
+              {} (:resize :none) (:flex-shrink 0) (:font-family ui/font-code) (:padding-bottom 240) (:padding 16) (:border-width "\"0 0 0 1px")
+                :border-color $ hsl 0 0 95
+                :border-style :solid
+                :background-color $ hsl 0 0 98
+        |read-from-dom! $ quote
+          defn read-from-dom! () $ let
+              el $ .-firstChild (js/document.getElementById "\"article")
+              text-array js/[]
+            -> el .-children (js/Array.from)
+              .!forEach $ fn (child & _xs)
+                if
+                  not= "\"PRE" $ .-tagName child
+                  .!push text-array $ .-innerText child
+            if-let
+              key $ get-env "\"azure-key"
+              speechOne
+                .join-str (to-calcit-data text-array) &newline
+                , key "\"en-US"
+                  fn $
+                  fn $
+              let
+                  msg $ new js/SpeechSynthesisUtterance
+                -> msg .-text $ set!
+                  .join-str (to-calcit-data text-array) &newline
+                js/speechSynthesis.speak msg
         |supported-langs $ quote
           def supported-langs $ {} ("\"clojure" "\"clojure") ("\"clj" "\"clojure") ("\"bash" "\"bash") ("\"js" "\"javascript") ("\"javascript" "\"javascript") ("\"html" "\"xml") ("\"xml" "\"xml") ("\"css" "\"css") ("\"coffeescript" "\"coffeescript") ("\"coffee" "\"coffeescript") ("\"ts" "\"typescript") ("\"typescript" "\"typescript")
       :ns $ quote
@@ -67,6 +103,8 @@
           [] "\"highlight.js" :as hljs
           [] "\"escape-html" :default escape-html
           [] feather.core :refer $ [] comp-i
+          respo.css :refer $ defstyle
+          "\"@memkits/azure-speech-util" :refer $ speechOne
     |app.config $ {}
       :defs $ {}
         |dev? $ quote
@@ -85,6 +123,7 @@
         |main! $ quote
           defn main! ()
             println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
+            if config/dev? $ load-console-formatter!
             .!registerLanguage hljs |clojure clojure-lang
             .!registerLanguage hljs |bash bash-lang
             .!registerLanguage hljs |coffeescript coffeescript-lang
