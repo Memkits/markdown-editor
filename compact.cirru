@@ -80,11 +80,9 @@
                   .!push text-array $ .-innerText child
             if-let
               key $ get-env "\"azure-key"
-              speechOne
+              speechQueue
                 .join-str (to-calcit-data text-array) &newline
-                , key "\"en-US"
-                  fn $
-                  fn $
+                , key "\"en-US" $ fn ()
               let
                   msg $ new js/SpeechSynthesisUtterance
                 -> msg .-text $ set!
@@ -104,7 +102,7 @@
           [] "\"escape-html" :default escape-html
           [] feather.core :refer $ [] comp-i
           respo.css :refer $ defstyle
-          "\"@memkits/azure-speech-util" :refer $ speechOne
+          "\"@memkits/azure-speech-util" :refer $ speechQueue
     |app.config $ {}
       :defs $ {}
         |dev? $ quote

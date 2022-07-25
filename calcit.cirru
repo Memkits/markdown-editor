@@ -559,7 +559,7 @@
                               |b $ {} (:at 1651335578834) (:by |rJG4IHzWf) (:text "|\"azure-key") (:type :leaf)
                       |T $ {} (:at 1651334648166) (:by |rJG4IHzWf) (:type :expr)
                         :data $ {}
-                          |T $ {} (:at 1651335173250) (:by |rJG4IHzWf) (:text |speechOne) (:type :leaf)
+                          |T $ {} (:at 1653113439048) (:by |rJG4IHzWf) (:text |speechQueue) (:type :leaf)
                           |b $ {} (:at 1651334976463) (:by |rJG4IHzWf) (:type :expr)
                             :data $ {}
                               |D $ {} (:at 1651334978175) (:by |rJG4IHzWf) (:text |.join-str) (:type :leaf)
@@ -571,11 +571,6 @@
                           |g $ {} (:at 1651335574452) (:by |rJG4IHzWf) (:text |key) (:type :leaf)
                           |m $ {} (:at 1651335368017) (:by |rJG4IHzWf) (:text "|\"en-US") (:type :leaf)
                           |o $ {} (:at 1651335005546) (:by |rJG4IHzWf) (:type :expr)
-                            :data $ {}
-                              |T $ {} (:at 1651335005835) (:by |rJG4IHzWf) (:text |fn) (:type :leaf)
-                              |b $ {} (:at 1651335006237) (:by |rJG4IHzWf) (:type :expr)
-                                :data $ {}
-                          |q $ {} (:at 1651335005546) (:by |rJG4IHzWf) (:type :expr)
                             :data $ {}
                               |T $ {} (:at 1651335005835) (:by |rJG4IHzWf) (:text |fn) (:type :leaf)
                               |b $ {} (:at 1651335006237) (:by |rJG4IHzWf) (:type :expr)
@@ -767,7 +762,7 @@
                     |D $ {} (:at 1651334963646) (:by |rJG4IHzWf) (:text |:refer) (:type :leaf)
                     |T $ {} (:at 1651334960252) (:by |rJG4IHzWf) (:type :expr)
                       :data $ {}
-                        |T $ {} (:at 1651335170840) (:by |rJG4IHzWf) (:text |speechOne) (:type :leaf)
+                        |T $ {} (:at 1653113440858) (:by |rJG4IHzWf) (:text |speechQueue) (:type :leaf)
         :proc $ {} (:id |rksbjOYqpSZ) (:time 1499755354983) (:type :expr)
           :data $ {}
       |app.config $ {}
