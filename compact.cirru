@@ -115,9 +115,9 @@
         |*reel $ quote
           defatom *reel $ -> reel-schema/reel (assoc :base schema/store) (assoc :store schema/store)
         |dispatch! $ quote
-          defn dispatch! (op op-data)
+          defn dispatch! (op)
             when config/dev? $ println "\"Dispatch:" op
-            reset! *reel $ reel-updater updater @*reel op op-data
+            reset! *reel $ reel-updater updater @*reel op
         |main! $ quote
           defn main! ()
             println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
@@ -138,7 +138,8 @@
             let
                 raw $ js/localStorage.getItem (:storage-key config/site)
               if (some? raw)
-                do $ dispatch! :hydrate-storage (parse-cirru-edn raw)
+                do $ dispatch!
+                  :: :hydrate-storage $ parse-cirru-edn raw
             println "|App started."
         |mount-target $ quote
           def mount-target $ .querySelector js/document |.app
@@ -148,7 +149,7 @@
               and
                 = "\"e" $ .-key event
                 .-metaKey event
-              dispatch! :toggle nil
+              dispatch! $ :: :toggle
         |persist-storage! $ quote
           defn persist-storage! (? e)
             js/localStorage.setItem (:storage-key config/site)
@@ -194,13 +195,14 @@
     |app.updater $ {}
       :defs $ {}
         |updater $ quote
-          defn updater (store op op-data op-id op-time)
-            case-default op
-              do (println "\"Unknown op:" op) store
-              :states $ update-states store op-data
-              :content $ assoc store :content op-data
-              :hydrate-storage op-data
-              :toggle $ update store :preview? not
+          defn updater (store op op-id op-time)
+            tag-match op
+                :states cursor s
+                update-states store cursor s
+              (:content c) (assoc store :content c)
+              (:hydrate-storage d) d
+              (:toggle) (update store :preview? not)
+              _ $ do (eprintln "\"Unknown op:" op) store
       :ns $ quote
         ns app.updater $ :require
           [] respo.cursor :refer $ [] update-states
