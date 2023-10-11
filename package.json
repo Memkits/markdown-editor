@@ -12,13 +12,13 @@
   "license": "MIT",
   "devDependencies": {
     "bottom-tip": "^0.1.5",
-    "vite": "^4.4.3"
+    "vite": "^4.4.11"
   },
   "dependencies": {
-    "@calcit/procs": "^0.7.5",
+    "@calcit/procs": "^0.8.4",
     "@memkits/azure-speech-util": "^0.0.5",
     "escape-html": "^1.0.3",
-    "feather-icons": "^4.29.0",
+    "feather-icons": "^4.29.1",
     "highlight.js": "^11.8.0",
     "shortid": "^2.2.16"
   }
