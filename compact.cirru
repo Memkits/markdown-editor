@@ -14,7 +14,7 @@
                   states $ :states store
                   preview? $ :preview? store
                 div
-                  {} $ :class-name css-container
+                  {} $ :class-name style-container
                   div
                     {} (:id "\"article")
                       :style $ merge ui/flex
@@ -42,7 +42,8 @@
                         {} (:position :fixed) (:top 0) (:right 0)
                       div
                         {} (:class-name css-icon)
-                          :on-click $ fn (e d!) (d! :toggle nil)
+                          :on-click $ fn (e d!)
+                            d! $ :: :toggle
                         comp-i :film 14 $ hsl 200 80 80
                       div
                         {} (:class-name css-icon)
@@ -55,11 +56,6 @@
                         {} (:href "\"https://github.com/Memkits/markdown-editor") (:target "\"_blank")
                         comp-i :github 14 $ hsl 200 80 80
                   comp-reel (>> states :reel) reel $ {}
-        |css-container $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defstyle css-container $ {}
-              "\"$0" $ merge ui/global ui/row ui/fullscreen
-                {} $ :overflow :hidden
         |css-icon $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-icon $ {}
@@ -93,6 +89,11 @@
                   -> msg .-text $ set!
                     .join-str (to-calcit-data text-array) &newline
                   js/speechSynthesis.speak msg
+        |style-container $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-container $ {}
+              "\"$0" $ merge ui/global ui/row ui/fullscreen
+                {} $ :overflow :hidden
         |supported-langs $ %{} :CodeEntry (:doc |)
           :code $ quote
             def supported-langs $ {} ("\"clojure" "\"clojure") ("\"clj" "\"clojure") ("\"bash" "\"bash") ("\"js" "\"javascript") ("\"javascript" "\"javascript") ("\"html" "\"xml") ("\"xml" "\"xml") ("\"css" "\"css") ("\"coffeescript" "\"coffeescript") ("\"coffee" "\"coffeescript") ("\"ts" "\"typescript") ("\"typescript" "\"typescript")
