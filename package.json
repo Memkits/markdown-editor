@@ -12,16 +12,15 @@
   "license": "MIT",
   "devDependencies": {
     "bottom-tip": "^0.1.5",
-    "vite": "^6.1.6"
+    "vite": "^6.3.5"
   },
   "dependencies": {
-    "@calcit/procs": "^0.9.8",
+    "@calcit/procs": "^0.9.13",
     "@memkits/azure-speech-util": "^0.0.5",
     "cirru-color": "^0.2.4",
     "copy-text-to-clipboard": "^3.2.0",
     "escape-html": "^1.0.3",
     "feather-icons": "^4.29.2",
-    "highlight.js": "^11.11.1",
-    "shortid": "^2.2.16"
+    "highlight.js": "^11.11.1"
   }
 }

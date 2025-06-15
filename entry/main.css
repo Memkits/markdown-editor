@@ -10,24 +10,25 @@ body * {
 }
 
 ::-webkit-scrollbar {
-  width: 2px;
-  height: 2px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: hsla(0,0%,100%);
+  background-color: hsl(0,0%,100%);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: hsla(200,100%,76%,0.8);
+  background-color: hsla(160,50%,80%,0.9);
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-corner {
   background-color: transparent;
 }
 
-::-webkit-resizer{
-  background-color:transparent;
+::-webkit-resizer {
+  background-color: transparent;
 }
 
 .md-p {
