@@ -1,12 +1,12 @@
 
-{} (:package |app)
+{} (:about "|file is generated - never edit directly; learn cr edit/tree workflows before changing") (:package |app)
   :configs $ {} (:init-fn |app.main/main!) (:reload-fn |app.main/reload!) (:version |0.0.1)
-    :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-ui.calcit/ |respo-markdown.calcit/ |reel.calcit/ |respo-feather.calcit/
+    :modules $ [] |respo.calcit/ |memof/ |respo-ui.calcit/ |respo-markdown.calcit/ |reel.calcit/ |respo-feather.calcit/
   :entries $ {}
   :files $ {}
     |app.comp.container $ %{} :FileEntry
       :defs $ {}
-        |comp-container $ %{} :CodeEntry (:doc |)
+        |comp-container $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defcomp comp-container (reel)
               let
@@ -27,7 +27,8 @@
                         :style $ {} (:font-size 16)
                         :highlight $ fn (code lang)
                           if (contains? supported-langs lang)
-                            .-value $ hljs/highlight (get supported-langs lang) code
+                            .-value $ .!highlight hljs code
+                              {} $ :language (get supported-langs lang)
                             escape-html code
                   if (not preview?)
                     textarea $ {} (:class-name css-textbox)
@@ -56,12 +57,14 @@
                         {} (:href "\"https://github.com/Memkits/markdown-editor") (:target "\"_blank")
                         comp-i :github 14 $ hsl 200 80 80
                   comp-reel (>> states :reel) reel $ {}
-        |css-icon $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |css-icon $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defstyle css-icon $ {}
               "\"$0" $ merge ui/center
                 {} (:width 40) (:height 40) (:cursor :pointer)
-        |css-textbox $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |css-textbox $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defstyle css-textbox $ {}
               "\"$0" $ merge ui/textarea ui/flex
@@ -69,7 +72,8 @@
                   :border-color $ hsl 0 0 95
                   :border-style :solid
                   :background-color $ hsl 0 0 98
-        |read-from-dom! $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |read-from-dom! $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defn read-from-dom! () $ let
                 el $ .-firstChild (js/document.getElementById "\"article")
@@ -89,15 +93,18 @@
                   -> msg .-text $ set!
                     .join-str (to-calcit-data text-array) &newline
                   js/speechSynthesis.speak msg
-        |style-container $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |style-container $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defstyle style-container $ {}
               "\"$0" $ merge ui/global ui/row ui/fullscreen
                 {} $ :overflow :hidden
-        |supported-langs $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |supported-langs $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             def supported-langs $ {} ("\"clojure" "\"clojure") ("\"clj" "\"clojure") ("\"bash" "\"bash") ("\"js" "\"javascript") ("\"javascript" "\"javascript") ("\"html" "\"xml") ("\"xml" "\"xml") ("\"css" "\"css") ("\"coffeescript" "\"coffeescript") ("\"coffee" "\"coffeescript") ("\"ts" "\"typescript") ("\"typescript" "\"typescript")
-      :ns $ %{} :CodeEntry (:doc |)
+          :examples $ []
+      :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns app.comp.container $ :require
             [] respo-ui.core :refer $ [] hsl
@@ -106,32 +113,36 @@
             [] respo.comp.space :refer $ [] =<
             [] reel.comp.reel :refer $ [] comp-reel
             [] respo-md.comp.md :refer $ [] comp-md comp-md-block
-            [] "\"highlight.js" :as hljs
+            [] "\"highlight.js/lib/core" :default hljs
             [] "\"escape-html" :default escape-html
             [] feather.core :refer $ [] comp-i
             respo.css :refer $ defstyle
             "\"@memkits/azure-speech-util" :refer $ speechQueue
     |app.config $ %{} :FileEntry
       :defs $ {}
-        |dev? $ %{} :CodeEntry (:doc |)
+        |dev? $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             def dev? $ = "\"dev" (get-env "\"mode" "\"release")
-        |site $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |site $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             def site $ {} (:dev-ui "\"http://localhost:8100/main-fonts.css") (:release-ui "\"http://cdn.tiye.me/favored-fonts/main-fonts.css") (:cdn-url "\"http://cdn.tiye.me/markdown-editor/") (:title "\"Markdown Editor") (:icon "\"http://cdn.tiye.me/logo/markdown-editor.png") (:storage-key "\"markdown-editor")
-      :ns $ %{} :CodeEntry (:doc |)
+          :examples $ []
+      :ns $ %{} :NsEntry (:doc |)
         :code $ quote (ns app.config)
     |app.main $ %{} :FileEntry
       :defs $ {}
-        |*reel $ %{} :CodeEntry (:doc |)
+        |*reel $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defatom *reel $ -> reel-schema/reel (assoc :base schema/store) (assoc :store schema/store)
-        |dispatch! $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |dispatch! $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defn dispatch! (op)
               when config/dev? $ println "\"Dispatch:" op
               reset! *reel $ reel-updater updater @*reel op
-        |main! $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |main! $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defn main! ()
               println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
@@ -155,10 +166,12 @@
                   do $ dispatch!
                     :: :hydrate-storage $ parse-cirru-edn raw
               println "|App started."
-        |mount-target $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |mount-target $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             def mount-target $ js/document.querySelector |.app
-        |on-window-keydown $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |on-window-keydown $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defn on-window-keydown (event)
               when
@@ -166,12 +179,14 @@
                   = "\"e" $ .-key event
                   .-metaKey event
                 dispatch! $ :: :toggle
-        |persist-storage! $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |persist-storage! $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defn persist-storage! (? e)
               js/localStorage.setItem (:storage-key config/site)
                 format-cirru-edn $ :store @*reel
-        |reload! $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |reload! $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defn reload! () $ if (nil? build-errors)
               do (remove-watch *reel :changes) (clear-cache!)
@@ -179,10 +194,12 @@
                 reset! *reel $ refresh-reel @*reel schema/store updater
                 hud! "\"ok~" "\"Ok"
               hud! "\"error" build-errors
-        |render-app! $ %{} :CodeEntry (:doc |)
+          :examples $ []
+        |render-app! $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defn render-app! () $ render! mount-target (comp-container @*reel) dispatch!
-      :ns $ %{} :CodeEntry (:doc |)
+          :examples $ []
+      :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns app.main $ :require
             [] respo.core :refer $ [] render! clear-cache! realize-ssr!
@@ -194,7 +211,7 @@
             [] reel.schema :as reel-schema
             [] cljs.reader :refer $ [] read-string
             [] app.config :as config
-            [] "\"highlight.js" :default hljs
+            [] "\"highlight.js/lib/core" :default hljs
             [] "\"highlight.js/lib/languages/clojure" :default clojure-lang
             [] "\"highlight.js/lib/languages/coffeescript" :default coffeescript-lang
             [] "\"highlight.js/lib/languages/javascript" :default javascript-lang
@@ -206,17 +223,18 @@
             "\"bottom-tip" :default hud!
     |app.schema $ %{} :FileEntry
       :defs $ {}
-        |store $ %{} :CodeEntry (:doc |)
+        |store $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             def store $ {}
               :states $ {}
               :content |
               :preview? false
-      :ns $ %{} :CodeEntry (:doc |)
+          :examples $ []
+      :ns $ %{} :NsEntry (:doc |)
         :code $ quote (ns app.schema)
     |app.updater $ %{} :FileEntry
       :defs $ {}
-        |updater $ %{} :CodeEntry (:doc |)
+        |updater $ %{} :CodeEntry (:doc |) (:schema nil)
           :code $ quote
             defn updater (store op op-id op-time)
               tag-match op
@@ -226,7 +244,8 @@
                 (:hydrate-storage d) d
                 (:toggle) (update store :preview? not)
                 _ $ do (eprintln "\"Unknown op:" op) store
-      :ns $ %{} :CodeEntry (:doc |)
+          :examples $ []
+      :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns app.updater $ :require
             [] respo.cursor :refer $ [] update-states
