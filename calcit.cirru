@@ -73,7 +73,7 @@
                   :border-style :solid
                   :background-color $ hsl 0 0 98
           :examples $ []
-        |read-from-dom! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |read-from-dom! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn read-from-dom! () $ let
                 el $ .-firstChild (js/document.getElementById |article)
@@ -94,6 +94,10 @@
                     .join-str (to-calcit-data text-array) &newline
                   js/speechSynthesis.speak msg
           :examples $ []
+          :schema $ :: :fn
+            {} (:return :dynamic)
+              :args $ []
+              :features $ #{} :js-ffi
         |style-container $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defstyle style-container $ {}
@@ -142,7 +146,7 @@
               when config/dev? $ println |Dispatch: op
               reset! *reel $ reel-updater updater @*reel op
           :examples $ []
-        |main! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |main! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn main! ()
               println "|Running mode:" $ if config/dev? |dev |release
@@ -167,6 +171,10 @@
                     :: :hydrate-storage $ parse-cirru-edn raw
               println "|App started."
           :examples $ []
+          :schema $ :: :fn
+            {} (:return :dynamic)
+              :args $ []
+              :features $ #{} :js-ffi
         |mount-target $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             def mount-target $ js/document.querySelector |.app
