@@ -10,9 +10,9 @@
           :code $ quote
             defcomp comp-container (reel)
               let
-                  store $ :store reel
-                  states $ :states store
-                  preview? $ :preview? store
+                  store $ &map:get reel :store
+                  states $ &map:get store :states
+                  preview? $ &map:get store :preview?
                 div
                   {} $ :class-name style-container
                   div
@@ -22,20 +22,22 @@
                           :padding $ if preview? "|40px 240px 240px 240px" "|16px 16px 240px 16px"
                           :flex-shrink 0
                           :overflow :auto
-                    comp-md-block (:content store)
+                    comp-md-block (&map:get store :content)
                       {} (:css |)
                         :style $ {} (:font-size 16)
                         :highlight $ fn (code lang)
                           if (contains? supported-langs lang)
-                            .-value $ .!highlight hljs code
-                              {} $ :language (get supported-langs lang)
+                            .-value $ unsafe-coerce
+                              .!highlight hljs code
+                                {} $ :language (get supported-langs lang)
+                              , JsObject
                             escape-html code
                   if (not preview?)
                     textarea $ {} (:class-name css-textbox)
-                      :value $ :content store
+                      :value $ &map:get store :content
                       :placeholder "|Markdown syntax supported~"
                       :on-input $ fn (e d!)
-                        d! :content $ :value e
+                        d! :content $ &map:get e :value
                       :autofocus true
                   div ({})
                     div
@@ -76,10 +78,15 @@
         |read-from-dom! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn read-from-dom! () $ let
-                el $ .-firstChild (js/document.getElementById |article)
-                text-array js/[]
-              -> el .-children (js/Array.from)
-                .!forEach $ fn (child & _xs)
+                el $ unsafe-coerce
+                  .-firstChild $ unsafe-coerce (js/document.getElementById |article) JsObject
+                  , JsObject
+                text-array $ unsafe-coerce (js/[]) JsObject
+              .!forEach
+                unsafe-coerce
+                  js/Array.from $ .-children el
+                  , JsObject
+                fn (child & _xs)
                   if
                     not= |PRE $ .-tagName child
                     .!push text-array $ .-innerText child
@@ -165,10 +172,10 @@
               js/window.addEventListener |keydown on-window-keydown
               flipped js/setInterval 60000 persist-storage!
               let
-                  raw $ js/localStorage.getItem (:storage-key config/site)
-                if (some? raw)
-                  do $ dispatch!
-                    :: :hydrate-storage $ parse-cirru-edn raw
+                  raw $ js/localStorage.getItem (&map:get config/site :storage-key)
+                when (js-present? raw)
+                  dispatch! $ :: :hydrate-storage
+                    parse-cirru-edn $ unsafe-coerce raw String
               println "|App started."
           :examples $ []
           :schema $ :: :fn
@@ -191,8 +198,8 @@
         |persist-storage! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defn persist-storage! (? e)
-              js/localStorage.setItem (:storage-key config/site)
-                format-cirru-edn $ :store @*reel
+              js/localStorage.setItem (&map:get config/site :storage-key)
+                format-cirru-edn $ &map:get @*reel :store
           :examples $ []
         |reload! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
