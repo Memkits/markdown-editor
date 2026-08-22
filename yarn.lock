@@ -5,14 +5,14 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
-"@calcit/procs@npm:^0.12.50":
-  version: 0.12.50
-  resolution: "@calcit/procs@npm:0.12.50"
+"@calcit/procs@npm:^0.13.29":
+  version: 0.13.29
+  resolution: "@calcit/procs@npm:0.13.29"
   dependencies:
     "@calcit/ternary-tree": "npm:0.0.26"
     "@cirru/parser.ts": "npm:^0.0.9"
     "@cirru/writer.ts": "npm:^0.1.9"
-  checksum: 10c0/415f3b5a8edff378801da4b04c8ec621e24fc51e6ef97e3077271b8fe16fb870f0349791ed28dca0e245429808d789aebc14c8da0cdc8479a6cf7f082782422d
+  checksum: 10c0/d8db7c62054dda827557f1bd8c8d7a777c17b40bd43f51fb3b39c57386d1c1a41dad449b641201daa05ad14c38a423601c803b5d9eb3557ae0173ae1a03f570a
   languageName: node
   linkType: hard
 
@@ -821,7 +821,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "markdown-editor@workspace:."
   dependencies:
-    "@calcit/procs": "npm:^0.12.50"
+    "@calcit/procs": "npm:^0.13.29"
     "@memkits/azure-speech-util": "npm:^0.0.5"
     bottom-tip: "npm:^0.1.5"
     cirru-color: "npm:^0.2.4"
