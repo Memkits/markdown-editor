@@ -6,9 +6,9 @@
       :modules $ [] |respo.calcit/ |memof/ |respo-ui.calcit/ |respo-markdown.calcit/ |reel.calcit/ |respo-feather.calcit/ |js-ffi/
       :type-slots $ {}
   :files $ {}
-    |app.comp.container $ %{} 'FileEntry
+    'app.comp.container $ %{} 'FileEntry
       :defs $ {}
-        |comp-container $ %{} 'CodeEntry (:doc |)
+        'comp-container $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defcomp comp-container (reel)
               let
@@ -63,14 +63,14 @@
                   comp-reel (>> states :reel) reel $ {}
           :examples $ []
           :schema $ :: 'Dynamic
-        |css-icon $ %{} 'CodeEntry (:doc |)
+        'css-icon $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defstyle css-icon $ {}
               |$0 $ merge ui/center
                 {} (:width 40) (:height 40) (:cursor :pointer)
           :examples $ []
           :schema $ :: 'Dynamic
-        |css-textbox $ %{} 'CodeEntry (:doc |)
+        'css-textbox $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defstyle css-textbox $ {}
               |$0 $ merge ui/textarea ui/flex
@@ -80,7 +80,7 @@
                   :background-color $ hsl 0 0 98
           :examples $ []
           :schema $ :: 'Dynamic
-        |read-from-dom! $ %{} 'CodeEntry (:doc |)
+        'read-from-dom! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn read-from-dom! () $ let
                 el $ unsafe-coerce
@@ -93,31 +93,31 @@
                   , JsObject
                 fn (child & _xs)
                   if
-                    not= |PRE $ .-tagName child
+                    not= |PRE $ unsafe-coerce (.-tagName child) 'String
                     .!push text-array $ .-innerText child
               if-let
                 key $ get-env |azure-key
                 speechQueue
-                  .join-str (to-calcit-data text-array) &newline
+                  join-str (to-calcit-data text-array) &newline
                   , key |en-US $ fn ()
                 let
                     msg $ new js/SpeechSynthesisUtterance
                   -> msg .-text $ set!
-                    .join-str (to-calcit-data text-array) &newline
+                    join-str (to-calcit-data text-array) &newline
                   js/speechSynthesis.speak msg
           :examples $ []
           :schema $ :: 'Fn
             {} (:return 'Dynamic)
               :args $ []
               :features $ #{} :js-ffi
-        |style-container $ %{} 'CodeEntry (:doc |)
+        'style-container $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defstyle style-container $ {}
               |$0 $ merge ui/global ui/row ui/fullscreen
-                {} $ :overflow :hidden
+                {} $ :overflow |hidden
           :examples $ []
           :schema $ :: 'Dynamic
-        |supported-langs $ %{} 'CodeEntry (:doc |)
+        'supported-langs $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def supported-langs $ {} (|clojure |clojure) (|clj |clojure) (|bash |bash) (|js |javascript) (|javascript |javascript) (|html |xml) (|xml |xml) (|css |css) (|coffeescript |coffeescript) (|coffee |coffeescript) (|ts |typescript) (|typescript |typescript)
           :examples $ []
@@ -136,37 +136,37 @@
             [] feather.core :refer $ [] comp-i
             respo.css :refer $ defstyle
             |@memkits/azure-speech-util :refer $ speechQueue
-    |app.config $ %{} 'FileEntry
+    'app.config $ %{} 'FileEntry
       :defs $ {}
-        |dev? $ %{} 'CodeEntry (:doc |)
+        'dev? $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def dev? $ let
                 mode $ option:unwrap-or (get-env |mode) |release
               = mode |dev
           :examples $ []
           :schema $ :: 'Dynamic
-        |site $ %{} 'CodeEntry (:doc |)
+        'site $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def site $ {} (:dev-ui |http://localhost:8100/main-fonts.css) (:release-ui |http://cdn.tiye.me/favored-fonts/main-fonts.css) (:cdn-url |http://cdn.tiye.me/markdown-editor/) (:title "|Markdown Editor") (:icon |http://cdn.tiye.me/logo/markdown-editor.png) (:storage-key |markdown-editor)
           :examples $ []
           :schema $ :: 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote (ns app.config)
-    |app.main $ %{} 'FileEntry
+    'app.main $ %{} 'FileEntry
       :defs $ {}
-        |*reel $ %{} 'CodeEntry (:doc |)
+        '*reel $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defatom *reel $ -> reel-schema/reel (assoc :base schema/store) (assoc :store schema/store)
           :examples $ []
           :schema $ :: 'Dynamic
-        |dispatch! $ %{} 'CodeEntry (:doc |)
+        'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn dispatch! (op)
               when config/dev? $ println |Dispatch: op
               reset! *reel $ reel-updater updater @*reel op
           :examples $ []
           :schema $ :: 'Dynamic
-        |main! $ %{} 'CodeEntry (:doc |)
+        'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn main! ()
               println "|Running mode:" $ if config/dev? |dev |release
@@ -195,29 +195,29 @@
             {} (:return 'Dynamic)
               :args $ []
               :features $ #{} :js-ffi
-        |mount-target $ %{} 'CodeEntry (:doc |)
+        'mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def mount-target $ js/document.querySelector |.app
           :examples $ []
           :schema $ :: 'Dynamic
-        |on-window-keydown $ %{} 'CodeEntry (:doc |)
+        'on-window-keydown $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn on-window-keydown (event)
               when
                 and
-                  = |e $ .-key event
-                  .-metaKey event
+                  = |e $ unsafe-coerce (.-key event) 'String
+                  unsafe-coerce (.-metaKey event) 'Bool
                 dispatch! $ :: :toggle
           :examples $ []
           :schema $ :: 'Dynamic
-        |persist-storage! $ %{} 'CodeEntry (:doc |)
+        'persist-storage! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn persist-storage! (? e)
               js/localStorage.setItem (&map:get config/site :storage-key)
                 format-cirru-edn $ &map:get @*reel :store
           :examples $ []
           :schema $ :: 'Dynamic
-        |reload! $ %{} 'CodeEntry (:doc |)
+        'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn reload! () $ if (nil? build-errors)
               do (remove-watch *reel :changes) (clear-cache!)
@@ -227,7 +227,7 @@
               hud! |error build-errors
           :examples $ []
           :schema $ :: 'Dynamic
-        |render-app! $ %{} 'CodeEntry (:doc |)
+        'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn render-app! () $ render! mount-target (comp-container @*reel) dispatch!
           :examples $ []
@@ -254,9 +254,9 @@
             [] |highlight.js/lib/languages/bash :default bash-lang
             |./calcit.build-errors :default build-errors
             |bottom-tip :default hud!
-    |app.schema $ %{} 'FileEntry
+    'app.schema $ %{} 'FileEntry
       :defs $ {}
-        |store $ %{} 'CodeEntry (:doc |)
+        'store $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def store $ {}
               :states $ {}
@@ -266,12 +266,12 @@
           :schema $ :: 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote (ns app.schema)
-    |app.updater $ %{} 'FileEntry
+    'app.updater $ %{} 'FileEntry
       :defs $ {}
-        |updater $ %{} 'CodeEntry (:doc |)
+        'updater $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn updater (store op op-id op-time)
-              tag-match op
+              match op
                 (:states cursor s) (update-states store cursor s)
                 (:content c) (assoc store :content c)
                 (:hydrate-storage d) d

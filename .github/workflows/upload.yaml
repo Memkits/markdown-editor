@@ -1,5 +1,8 @@
 name: Upload
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -10,7 +13,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.0
+      with:
+        persist-credentials: false
 
     - uses: actions/setup-node@v6
       with:
@@ -22,15 +27,24 @@ jobs:
         corepack prepare yarn@4.12.0 --activate
         yarn --version
 
-    - uses: calcit-lang/setup-calcit@v1
+    - uses: calcit-lang/setup-calcit@704b3f5cd6f9ce3bd1e0c926dbdd1d181adb8180 # v1
 
-    - name: "compiles to js"
+    - name: Install dependencies
       run: |
-        caps --ci
+        caps --strict --ci
         yarn install --immutable
+
+    - name: Verify Calcit runtime toolchain
+      run: caps verify --toolchain
+
+    - name: Validate Calcit snapshot and types
+      run: |
         calcit calcit.cirru edit format
         git diff --exit-code -- calcit.cirru
         calcit calcit.cirru --check-only
+
+    - name: Compile and build web app
+      run: |
         calcit calcit.cirru js
         yarn vite build --base=./
 
