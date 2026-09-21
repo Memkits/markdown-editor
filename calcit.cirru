@@ -5,7 +5,7 @@
   :entries $ {} $ :default
     {} (:description |) (:init-fn 'app.main/main!) (:mode :native) (:reload-fn 'app.main/reload!)
       :feature-policy $ {}
-      :modules $ [] |respo.calcit/ |memof/ |respo-ui.calcit/ |respo-markdown.calcit/ |reel.calcit/ |respo-feather.calcit/ |js-ffi/
+      :modules $ [] |respo.calcit/ |respo-ui.calcit/ |respo-markdown.calcit/ |reel.calcit/ |respo-feather.calcit/ |js-ffi/
       :type-slots $ {}
   :files $ {}
     'app.comp.container $ %{} 'FileEntry
@@ -147,12 +147,11 @@
                 text $ join-str
                   collect-readable-text children 0 $ []
                   , &newline
-              do
-                if-let
-                  key $ get-env |azure-key
-                  speechQueue text key |en-US $ fn () &unit
-                  speak-text! text
-                , &unit
+              if-let
+                key $ get-env |azure-key
+                speechQueue text key |en-US $ fn () &unit
+                speak-text! text
+              , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
@@ -162,7 +161,8 @@
             let
                 message $ unsafe-coerce (new js/SpeechSynthesisUtterance) SpeechMessageHost
                 synthesis $ unsafe-coerce js/speechSynthesis SpeechSynthesisHost
-              do (js-set message :text text) (.speak! synthesis message)
+              js-set message :text text
+              .speak! synthesis message
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'String
@@ -268,15 +268,14 @@
           :schema $ :: 'js-ffi.browser/DomElementHost
         'on-window-keydown $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-window-keydown (event)
-            do
-              let
-                  keyboard $ unsafe-coerce event js-ffi.browser/KeyboardEventHost
-                when
-                  and
-                    = |e $ keyboard :key
-                    keyboard :meta-key?
-                  dispatch! $ :: :toggle
-              , &unit
+            let
+                keyboard $ unsafe-coerce event js-ffi.browser/KeyboardEventHost
+              when
+                and
+                  = |e $ keyboard :key
+                  keyboard :meta-key?
+                dispatch! $ :: :toggle
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'js-ffi.browser/EventHost
@@ -352,10 +351,7 @@
           :schema $ :: 'StructDef
         'store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def store
-            %{} Store
-              :states $ {}
-              :content |
-              :preview? false
+            Store :states ({}) :content | :preview? false
           :examples $ []
           :schema $ :: 'app.schema/Store
       :ns $ %{} 'NsEntry (:doc |)
