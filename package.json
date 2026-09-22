@@ -1,6 +1,6 @@
 {
   "name": "markdown-editor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "a markdown editor demo",
   "main": "index.js",
   "packageManager": "yarn@4.12.0",
@@ -15,7 +15,7 @@
     "vite": "^8.2.2"
   },
   "dependencies": {
-    "@calcit/procs": "0.17.1",
+    "@calcit/procs": "0.18.1",
     "@memkits/azure-speech-util": "^0.0.5",
     "cirru-color": "^0.2.4",
     "copy-text-to-clipboard": "^3.2.0",
