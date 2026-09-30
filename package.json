@@ -1,9 +1,9 @@
 {
   "name": "markdown-editor",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "a markdown editor demo",
   "main": "index.js",
-  "packageManager": "yarn@4.12.0",
+  "packageManager": "yarn@4.18.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:Memkits/markdown-editor.git"
@@ -12,10 +12,10 @@
   "license": "MIT",
   "devDependencies": {
     "bottom-tip": "^0.1.5",
-    "vite": "^8.2.2"
+    "vite": "8.3.1"
   },
   "dependencies": {
-    "@calcit/procs": "0.22.0-alpha.3",
+    "@calcit/procs": "0.27.0",
     "@memkits/azure-speech-util": "^0.0.5",
     "cirru-color": "^0.2.4",
     "copy-text-to-clipboard": "^3.2.0",
@@ -23,5 +23,11 @@
     "escape-html": "^1.0.3",
     "feather-icons": "^4.29.2",
     "highlight.js": "^11.11.1"
+  },
+  "scripts": {
+    "compile": "calcit calcit.cirru js",
+    "build": "yarn compile && vite build",
+    "dev": "vite",
+    "release": "yarn build"
   }
 }
