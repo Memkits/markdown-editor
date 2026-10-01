@@ -27,7 +27,7 @@
   "scripts": {
     "compile": "calcit calcit.cirru js",
     "build": "yarn compile && vite build",
-    "dev": "vite",
+    "dev": "yarn compile && vite",
     "release": "yarn build"
   }
 }
