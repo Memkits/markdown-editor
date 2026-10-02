@@ -31,9 +31,10 @@ older Markdown version over the editor's contract fix.
 
 CI keeps canonical formatting, strict entry/all-public checks and real build,
 without repeated migration/type-debt reports or new verification scripts/tests.
-Vite and COS action v1.1.1 share a frontend base: production remains
+Vite and COS action v1.2.0 share a frontend base: production remains
 `Memkits/markdown-editor/`, previews use `pr/<number>/<run-id>/<attempt>/`.
-Concurrency groups per PR and separately for production without cancellation.
+每个 PR 与生产分别串行排队，不取消正在运行的上传；生产上传前检查当前 main SHA，
+旧提交跳过 COS 和服务器部署。这不是跨 COS/rsync 的原子发布保证。
 Upload/public verification only uses the action. The original upload policy,
 server `dist/*` source and destination are unchanged; editing, speech and storage
 code are unchanged. PR upload success is not physical browser or paid speech
