@@ -36,14 +36,14 @@ jobs:
     - name: Set up Calcit and Caps
       uses: calcit-lang/setup-calcit@v1.5.0
       with:
-        version: "0.27.0"
+        version: "0.29.0"
         tools: calcit,caps
         caps-version: "0.1.1"
 
     - name: Resolve immutable dependencies
       run: |
         set -euo pipefail
-        caps --ci
+        caps --strict --ci
         yarn install --immutable
         caps verify --toolchain
 
@@ -52,11 +52,8 @@ jobs:
         set -euo pipefail
         calcit calcit.cirru edit format
         git diff --exit-code -- calcit.cirru
-        calcit calcit.cirru --check-only
-        calcit calcit.cirru analyze check-public \
-          --ns app.comp.container --ns app.config --ns app.main \
-          --ns app.schema --ns app.updater \
-          --summary-only --format json
+        calcit calcit.cirru --check-only --all-defs
+        calcit analyze weak-types --only deprecated-call --summary-only --format json | jq -e '.data.summary.calls == 0'
 
     - name: Select CDN asset path
       id: asset-path
