@@ -96,7 +96,7 @@
                             :return 'Unit
                         :return 'Unit
                       d! $ Op :content $ decode-map-as
-                        option:unwrap $ get e :value
+                        .unwrap $ get e :value
                         , 'String
                     :autofocus true
                 div ({})
@@ -145,7 +145,7 @@
                   result $ .highlight host code $ js-object
                     :language $ option:unwrap $ get supported-langs lang
                 result :value
-              escape-html code
+              contract/expect-string |escaped-code $ escape-html code
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'String)
             :args $ [] 'String 'String
@@ -192,19 +192,19 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.container
           :require
-            [] respo-ui.core :refer $ [] hsl
-            [] respo-ui.core :as ui
-            [] respo.core :refer $ [] defcomp >> <> div button textarea span a
-            [] respo.comp.space :refer $ [] =<
+            respo-ui.core :refer $ hsl
+            respo-ui.core :as ui
+            respo.core :refer $ defcomp >> <> div textarea a
             reel.comp.reel :refer $ comp-typed-reel
-            [] respo-md.comp.md :refer $ [] comp-md comp-md-block
-            [] |highlight.js/lib/core :default hljs
-            [] |escape-html :default escape-html
-            [] feather.core :refer $ [] comp-i
+            respo-md.comp.md :refer $ comp-md-block
+            |highlight.js/lib/core :default hljs
+            |escape-html :default escape-html
+            feather.core :refer $ comp-i
             respo.css :refer $ defstyle
             |@memkits/azure-speech-util :refer $ speechQueue
             js-ffi.browser :refer $ query-selector child-element-at
             app.schema :refer $ Op
+            js-ffi.contract :as contract
     'app.config $ %{} 'FileEntry
       :defs $ {}
         'dev? $ %{} 'CodeEntry (:doc |)
@@ -224,7 +224,7 @@
     'app.main $ %{} 'FileEntry
       :defs $ {}
         '*reel $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defatom *reel (typed/new-reel schema/store)
+          :code $ quote $ defref *reel (typed/new-reel schema/store)
           :examples $ []
           :schema $ :: 'Ref $ :: 'reel.typed/State 'app.schema/Op 'app.schema/Store
         'HighlightHost $ %{} 'CodeEntry (:doc |)
@@ -238,17 +238,20 @@
           :schema $ :: 'Trait
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
-            when config/dev? $ println |Dispatch: op
-            match (typed/decode-control op)
-              (:some control)
-                reset! *reel $ typed/apply-control updater @*reel control
-              (:none)
-                reset! *reel $ typed/record-op updater @*reel (assert-type op 'app.schema/Op) (generate-id!)
-                  :timestamp $ date-now-snapshot
+            if (enum? op)
+              do
+                when config/dev? $ println |Dispatch: op
+                match (typed/decode-control op)
+                  (:some control)
+                    reset! *reel $ typed/apply-control updater @*reel control
+                  (:none)
+                    reset! *reel $ typed/record-op updater @*reel (schema/decode-op op) (generate-id!) (now-ms)
+                , &unit
+              raise |Expected-Enum-operation
             , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Enum
+            :args $ [] 'Dynamic
             :features $ #{} :js-ffi
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
@@ -268,7 +271,7 @@
             add-event-listener! |keydown on-window-keydown
             set-interval! persist-storage! 60000
             match
-              storage-get $ &map:get config/site :storage-key
+              storage-get $ .unwrap $ get config/site :storage-key
               (:some raw)
                 match
                   schema/decode-store $ parse-cirru-edn raw
@@ -304,11 +307,13 @@
             :features $ #{} :js-ffi
         'persist-storage! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn persist-storage! ()
-            storage-set! (&map:get config/site :storage-key)
+            storage-set!
+              .unwrap $ get config/site :storage-key
               format-cirru-edn $ :store @*reel
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
+            :features $ #{} :js-ffi
         'register-language! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn register-language! (name language)
             let
@@ -325,40 +330,42 @@
                 add-watch! *reel :changes $ fn (reel prev) (render-app!)
                 reset! *reel $ typed/refresh updater @*reel schema/store
                 hud! |ok~ |Ok
-              hud! |error build-errors
+                , &unit
+              do (hud! |error build-errors) &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
+            :features $ #{} :js-ffi
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! ()
             render! (mount-target) (comp-container @*reel) dispatch!
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
+            :features $ #{} :js-ffi
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.main
           :require
-            [] respo.core :refer $ [] render! clear-cache! realize-ssr!
-            [] app.comp.container :refer $ [] comp-container
-            [] app.updater :refer $ [] updater
-            [] app.schema :as schema
-            [] reel.util :refer $ [] listen-devtools!
-            [] cljs.reader :refer $ [] read-string
-            [] app.config :as config
-            [] |highlight.js/lib/core :default hljs
-            [] |highlight.js/lib/languages/clojure :default clojure-lang
-            [] |highlight.js/lib/languages/coffeescript :default coffeescript-lang
-            [] |highlight.js/lib/languages/javascript :default javascript-lang
-            [] |highlight.js/lib/languages/css :default css-lang
-            [] |highlight.js/lib/languages/xml :default xml-lang
-            [] |highlight.js/lib/languages/typescript :default typescript-lang
-            [] |highlight.js/lib/languages/bash :default bash-lang
-            |./calcit.build-errors :default build-errors
+            respo.core :refer $ render! clear-cache!
+            app.comp.container :refer $ comp-container
+            app.updater :refer $ updater
+            app.schema :as schema
+            reel.util :refer $ listen-devtools!
+            app.config :as config
+            |highlight.js/lib/core :default hljs
+            |highlight.js/lib/languages/clojure :default clojure-lang
+            |highlight.js/lib/languages/coffeescript :default coffeescript-lang
+            |highlight.js/lib/languages/javascript :default javascript-lang
+            |highlight.js/lib/languages/css :default css-lang
+            |highlight.js/lib/languages/xml :default xml-lang
+            |highlight.js/lib/languages/typescript :default typescript-lang
+            |highlight.js/lib/languages/bash :default bash-lang
+            |./calcit.build-errors.mjs :default build-errors
             |bottom-tip :default hud!
             js-ffi.browser :refer $ query-selector add-event-listener! set-interval! storage-get storage-set!
             reel.typed :as typed
             respo.ffi.browser :refer $ narrow-element
-            js-ffi.shared :refer $ date-now-snapshot
+            js-ffi.shared :refer $ now-ms
     'app.schema $ %{} 'FileEntry
       :defs $ {}
         'Op $ %{} 'CodeEntry (:doc |)
@@ -376,11 +383,31 @@
             :preview? 'Bool
           :examples $ []
           :schema $ :: 'StructDef
+        'decode-op $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn decode-op (op)
+            match op
+              (:states cursor state)
+                Op :states
+                  decode-map-as cursor $ :: 'List 'Dynamic
+                  , state
+              (:content content)
+                Op :content $ decode-map-as content 'String
+              (:hydrate-storage data)
+                Op :hydrate-storage $ .unwrap $ decode-store data
+              (:toggle) (Op :toggle)
+              _ $ raise |Invalid-business-operation
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'app.schema/Op)
+            :args $ [] 'Enum
         'decode-store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn decode-store (data)
             if (struct? data)
               if (&struct:matches? data Store)
-                Option :some $ assert-type data 'app.schema/Store
+                match
+                  try-decode-map-as (&struct:to-map data) Store
+                  (:ok _)
+                    Option :some $ assert-type data 'app.schema/Store
+                  (:err _) (Option :none)
                 Option :none
               match (try-decode-map-as data Store)
                 (:ok stored) (Option :some stored)
@@ -402,7 +429,7 @@
           :code $ quote $ defn updater (store op op-id op-time)
             match op
               (:states cursor s)
-                assoc store :states $ assert-type
+                assoc store :states $ decode-map-as
                   update-state-tree (:states store) cursor s
                   :: 'Map 'Dynamic 'Dynamic
               (:content c) (assoc store :content c)
