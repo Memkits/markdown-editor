@@ -16,13 +16,14 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - uses: actions/checkout@v7.0.1
       with:
         persist-credentials: false
 
     - name: Set up Node.js
-      uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      uses: actions/setup-node@v6.5.0
       with:
         node-version: 24
         package-manager-cache: false
@@ -36,7 +37,7 @@ jobs:
     - name: Set up Calcit and Caps
       uses: calcit-lang/setup-calcit@v1.5.0
       with:
-        version: "0.29.0"
+        deps-file: deps.cirru
         tools: calcit,caps
         caps-version: "0.1.1"
 
@@ -45,14 +46,18 @@ jobs:
         set -euo pipefail
         caps --strict --ci
         yarn install --immutable
-        caps verify --toolchain
+        caps deps.cirru verify --toolchain
 
     - name: Validate Calcit snapshot and types
       run: |
         set -euo pipefail
+        test ! -e compact.cirru
+        test ! -e package.cirru
         calcit calcit.cirru edit format
         git diff --exit-code -- calcit.cirru
         calcit calcit.cirru --check-only --all-defs
+        calcit calcit.cirru --check-only --ns app.comp.container --ns app.config --ns app.main --ns app.schema --ns app.updater --summary-only
+        calcit calcit.cirru fix --workflow strict --verify
         calcit analyze weak-types --only deprecated-call --summary-only --format json | jq -e '.data.summary.calls == 0'
 
     - name: Select CDN asset path
@@ -77,6 +82,7 @@ jobs:
       run: |
         set -euo pipefail
         yarn build
+        node --test tests/*.test.mjs
 
     - name: Check current production revision
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -130,7 +136,7 @@ jobs:
       id: deploy
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         && steps.production.outputs.current == 'true'
-      uses: Pendect/action-rsyncer@8e05ffa5c93e5d9c9b167796b26044d2c616b2b9 # v2.0.0
+      uses: Pendect/action-rsyncer@v2.0.0
       env:
         DEPLOY_KEY: ${{ secrets.rsync_private_key }}
       with:
