@@ -46,7 +46,7 @@ jobs:
         set -euo pipefail
         caps --strict --ci
         yarn install --immutable
-        caps deps.cirru verify --toolchain
+        caps verify --toolchain
 
     - name: Validate Calcit snapshot and types
       run: |
@@ -57,7 +57,7 @@ jobs:
         git diff --exit-code -- calcit.cirru
         calcit calcit.cirru --check-only --all-defs
         calcit calcit.cirru --check-only --ns app.comp.container --ns app.config --ns app.main --ns app.schema --ns app.updater --summary-only
-        calcit calcit.cirru fix --workflow strict --verify
+        calcit calcit.cirru fix --workflow strict --verify --format json | jq -e '.data.workflow.status == "passed" and .diagnostics == []'
         calcit analyze weak-types --only deprecated-call --summary-only --format json | jq -e '.data.summary.calls == 0'
 
     - name: Select CDN asset path
