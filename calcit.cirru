@@ -25,22 +25,6 @@
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :value |value
           :schema $ :: 'Trait
-        'SpeechMessageHost $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait SpeechMessageHost (:text 'String)
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
-            :names $ {} $ :text |text
-            :writable $ #{} :text
-          :schema $ :: 'Trait
-        'SpeechSynthesisHost $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait SpeechSynthesisHost
-            .speak! $ :: 'Fn $ {}
-              :args $ [] 'app.comp.container/SpeechSynthesisHost 'app.comp.container/SpeechMessageHost
-              :return 'Unit
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
-            :names $ {} $ :speak! |speak
-          :schema $ :: 'Trait
         'collect-readable-text $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn collect-readable-text (children idx acc)
             if
@@ -72,7 +56,7 @@
                 {} $ :class-name style-container
                 div
                   {} (:id |article)
-                    :style $ merge ui/flex $ {}
+                    :style $ .merge ui/flex $ {}
                       :padding $ if preview? "|40px 240px 240px 240px" "|16px 16px 240px 16px"
                       :flex-shrink 0
                       :overflow :auto
@@ -112,7 +96,7 @@
                         :on-click $ fn (e d!) (read-from-dom!)
                       comp-i :volume-2 14 $ hsl 200 80 80
                   div
-                    {} $ :style $ merge ui/center
+                    {} $ :style $ .merge ui/center
                       {} (:width 40) (:height 40) (:position :fixed) (:right 0) (:bottom 0)
                     a
                       {} (:href |https://github.com/Memkits/markdown-editor) (:target |_blank)
@@ -124,13 +108,13 @@
             :features $ #{} :js-ffi
         'css-icon $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-icon
-            {} $ |$0 $ merge ui/center
+            {} $ |$0 $ .merge ui/center
               {} (:width 40) (:height 40) (:cursor :pointer)
           :examples $ []
           :schema $ :: 'String
         'css-textbox $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-textbox
-            {} $ |$0 $ merge ui/textarea ui/flex
+            {} $ |$0 $ .merge ui/textarea ui/flex
               {} (:resize :none) (:flex-shrink 0) (:font-family ui/font-code) (:padding-bottom 240) (:padding 16) (:border-width "|0 0 0 1px")
                 :border-color $ hsl 0 0 95
                 :border-style :solid
@@ -143,7 +127,7 @@
               let
                   host $ unsafe-coerce hljs HighlightHost
                   result $ .highlight host code $ js-object
-                    :language $ option:unwrap $ get supported-langs lang
+                    :language $ .unwrap $ get supported-langs lang
                 result :value
               contract/expect-string |escaped-code $ escape-html code
           :examples $ []
@@ -153,7 +137,7 @@
         'read-from-dom! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn read-from-dom! ()
             let
-                article $ option:unwrap $ query-selector "|#article > *"
+                article $ .unwrap $ query-selector "|#article > *"
                 children $ article :children
                 text $ join-string
                   collect-readable-text children 0 $ []
@@ -168,19 +152,14 @@
             :args $ []
             :features $ #{} :js-ffi
         'speak-text! $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn speak-text! (text)
-            let
-                message $ unsafe-coerce (new js/SpeechSynthesisUtterance) SpeechMessageHost
-                synthesis $ unsafe-coerce js/speechSynthesis SpeechSynthesisHost
-              js-set message :text text
-              .speak! synthesis message
+          :code $ quote $ defn speak-text! (text) (speech-synthesis-speak! text)
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'String
             :features $ #{} :js-ffi
         'style-container $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-container
-            {} $ |$0 $ merge ui/global ui/row ui/fullscreen
+            {} $ |$0 $ .merge ui/global ui/row ui/fullscreen
               {} $ :overflow |hidden
           :examples $ []
           :schema $ :: 'String
@@ -202,7 +181,7 @@
             feather.core :refer $ comp-i
             respo.css :refer $ defstyle
             |@memkits/azure-speech-util :refer $ speechQueue
-            js-ffi.browser :refer $ query-selector child-element-at
+            js-ffi.browser :refer $ query-selector child-element-at speech-synthesis-speak!
             app.schema :refer $ Op
             js-ffi.contract :as contract
     'app.config $ %{} 'FileEntry
@@ -210,7 +189,7 @@
         'dev? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dev?
             let
-                mode $ option:unwrap-or (get-env |mode) |release
+                mode $ .unwrap-or (get-env |mode) |release
               = mode |dev
           :examples $ []
           :schema $ :: 'Bool
@@ -264,12 +243,6 @@
             register-language! |css css-lang
             register-language! |xml xml-lang
             register-language! |typescript typescript-lang
-            render-app!
-            add-watch! *reel :changes $ fn (r p) (render-app!)
-            listen-devtools! |a dispatch!
-            add-event-listener! |beforeunload $ fn (_) (persist-storage!)
-            add-event-listener! |keydown on-window-keydown
-            set-interval! persist-storage! 60000
             match
               storage-get $ .unwrap $ get config/site :storage-key
               (:some raw)
@@ -277,8 +250,15 @@
                   schema/decode-store $ parse-cirru-edn raw
                   (:some stored)
                     dispatch! $ schema/Op :hydrate-storage stored
-                  (:none) (eprintln "|Invalid stored Markdown editor state")
+                  (:none)
+                    raise "|Invalid stored Markdown editor state; existing archive is kept"
               (:none) &unit
+            render-app!
+            add-watch! *reel :changes $ fn (r p) (render-app!)
+            listen-devtools! |a dispatch!
+            add-event-listener! |beforeunload $ fn (_) (persist-storage!)
+            add-event-listener! |keydown on-window-keydown
+            set-interval! persist-storage! 60000
             println "|App started."
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
@@ -286,7 +266,7 @@
             :features $ #{} :js-ffi
         'mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn mount-target ()
-            narrow-element $ option:unwrap $ query-selector |.app
+            narrow-element $ .unwrap $ query-selector |.app
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.dom/DomElement)
             :args $ []
@@ -294,7 +274,7 @@
         'on-window-keydown $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-window-keydown (event)
             let
-                keyboard $ unsafe-coerce event js-ffi.browser/KeyboardEventHost
+                keyboard $ keyboard-event-host event
               when
                 and
                   = |e $ keyboard :key
@@ -362,7 +342,7 @@
             |highlight.js/lib/languages/bash :default bash-lang
             |./calcit.build-errors.mjs :default build-errors
             |bottom-tip :default hud!
-            js-ffi.browser :refer $ query-selector add-event-listener! set-interval! storage-get storage-set!
+            js-ffi.browser :refer $ query-selector add-event-listener! set-interval! storage-get storage-set! keyboard-event-host
             reel.typed :as typed
             respo.ffi.browser :refer $ narrow-element
             js-ffi.shared :refer $ now-ms

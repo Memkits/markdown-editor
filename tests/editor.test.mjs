@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { registerHooks } from "node:module";
 import javascript from "highlight.js/lib/languages/javascript";
+import { invoke_method } from "@calcit/procs";
 import * as c from "../js-out/calcit.core.mjs";
 import { store, Op, decode_store } from "../js-out/app.schema.mjs";
 import { updater } from "../js-out/app.updater.mjs";
@@ -11,7 +12,7 @@ import { component_$q_, component_tree, element_event, element_children, child_p
 import { event__GT_edn } from "../js-out/respo.util.format.mjs";
 
 const t = c.init_tags(["states", "content", "preview?", "store", "editor", "data", "input"]);
-const read = (value, key) => c.option_$o_unwrap(c.get(value, key));
+const read = (value, key) => invoke_method("unwrap", c.get(value, key));
 const op = (name, ...args) => c._PCT__$o__$o_(Op, c.init_tags([name])[name], ...args);
 const content = "# Editor fixture\n\n正文 :keyword\n\n```javascript\nconst answer = 42;\n```";
 const elements = [
@@ -49,10 +50,10 @@ try {
 
 function inputHandler(node) {
   if (component_$q_(node)) {
-    const tree = c.option_$o_unwrap_or(component_tree(node), null);
+    const tree = invoke_method("unwrap-or", component_tree(node), null);
     return tree === null ? null : inputHandler(tree);
   }
-  const own = c.option_$o_unwrap_or(c.get(element_event(node), t.input), null);
+  const own = invoke_method("unwrap-or", c.get(element_event(node), t.input), null);
   if (own) return own;
   for (const pair of element_children(node).toArray()) {
     const handler = inputHandler(child_pair_value(pair));
@@ -77,7 +78,7 @@ test("actual input Map, Markdown rendering and mixed UI cursor retain content", 
   assert.ok(html.includes("hljs-keyword"));
   assert.equal(app.highlight_code("<unknown>&", "unknown-language"), "&lt;unknown&gt;&amp;");
   const legacy = c._$n__$M_(t.states, c._$n__$M_(), t.content, content, t["preview?"], false);
-  assert.equal(read(c.option_$o_unwrap(decode_store(legacy)), t.content), content);
+  assert.equal(read(invoke_method("unwrap", decode_store(legacy)), t.content), content);
 });
 
 test("actual dispatch/save/hydrate and DOM reading preserve the original boundaries", () => {
@@ -94,14 +95,14 @@ test("actual dispatch/save/hydrate and DOM reading preserve the original boundar
   main.dispatch_$x_(op("toggle"));
   main.persist_storage_$x_();
   assert.equal(writes.size, 1);
-  const saved = c.option_$o_unwrap(decode_store(c.parse_cirru_edn(writes.get("markdown-editor"))));
+  const saved = invoke_method("unwrap", decode_store(c.parse_cirru_edn(writes.get("markdown-editor"))));
   main.dispatch_$x_(op("hydrate-storage", saved));
   const restored = read(c.deref(main._$s_reel), t.store);
   assert.equal(read(restored, t.content), content);
   assert.equal(read(restored, t["preview?"]), read(saved, t["preview?"]));
-  assert.equal(c.option_$o_unwrap(decode_store(restored)), restored);
+  assert.equal(invoke_method("unwrap", decode_store(restored)), restored);
   const spoken = [];
-  globalThis.SpeechSynthesisUtterance = class {};
+  globalThis.SpeechSynthesisUtterance = class { constructor(text = "") { this.text = text; } };
   globalThis.speechSynthesis = { speak(message) { spoken.push(message.text); } };
   app.read_from_dom_$x_();
   assert.deepEqual(spoken, ["Heading :keyword\nBody"]);
