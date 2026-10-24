@@ -1,0 +1,2600 @@
+[
+  {
+    "code": [
+      "def",
+      "calcit-dirname",
+      "|"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.$meta/calcit-dirname",
+    "js_ffi": null,
+    "schema": null,
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "calcit-filename",
+      "|calcit.cirru"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.$meta/calcit-filename",
+    "js_ffi": null,
+    "schema": null,
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "deftrait",
+      "HighlightHost",
+      [
+        ".highlight",
+        [
+          "::",
+          "'Fn",
+          [
+            "{}",
+            [
+              ":args",
+              [
+                "[]",
+                "'app.comp.container/HighlightHost",
+                "'String",
+                "'JsObject"
+              ]
+            ],
+            [
+              ":return",
+              "'app.comp.container/HighlightResultHost"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": {
+      ":backend": {
+        "__edn_tag": "js"
+      },
+      ":kind": {
+        "__edn_tag": "external-object"
+      },
+      ":names": {
+        ":highlight": "highlight"
+      },
+      ":target": {
+        "__edn_tag": "browser"
+      }
+    },
+    "ffi_edn": "{} (:backend :js) (:kind :external-object) (:target :browser)\n  :names $ {} $ :highlight |highlight",
+    "id": "app.comp.container/HighlightHost",
+    "js_ffi": null,
+    "schema": "'Trait",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "deftrait",
+      "HighlightResultHost",
+      [
+        ":value",
+        "'String"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": {
+      ":backend": {
+        "__edn_tag": "js"
+      },
+      ":kind": {
+        "__edn_tag": "external-object"
+      },
+      ":names": {
+        ":value": "value"
+      },
+      ":target": {
+        "__edn_tag": "browser"
+      }
+    },
+    "ffi_edn": "{} (:backend :js) (:kind :external-object) (:target :browser)\n  :names $ {} $ :value |value",
+    "id": "app.comp.container/HighlightResultHost",
+    "js_ffi": null,
+    "schema": "'Trait",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "deftrait",
+      "SpeechMessageHost",
+      [
+        ":text",
+        "'String"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": {
+      ":backend": {
+        "__edn_tag": "js"
+      },
+      ":kind": {
+        "__edn_tag": "external-object"
+      },
+      ":names": {
+        ":text": "text"
+      },
+      ":target": {
+        "__edn_tag": "browser"
+      },
+      ":writable": {
+        "__edn_set": [
+          {
+            "__edn_tag": "text"
+          }
+        ]
+      }
+    },
+    "ffi_edn": "{} (:backend :js) (:kind :external-object) (:target :browser)\n  :names $ {} $ :text |text\n  :writable $ #{} :text",
+    "id": "app.comp.container/SpeechMessageHost",
+    "js_ffi": null,
+    "schema": "'Trait",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "deftrait",
+      "SpeechSynthesisHost",
+      [
+        ".speak!",
+        [
+          "::",
+          "'Fn",
+          [
+            "{}",
+            [
+              ":args",
+              [
+                "[]",
+                "'app.comp.container/SpeechSynthesisHost",
+                "'app.comp.container/SpeechMessageHost"
+              ]
+            ],
+            [
+              ":return",
+              "'Unit"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": {
+      ":backend": {
+        "__edn_tag": "js"
+      },
+      ":kind": {
+        "__edn_tag": "external-object"
+      },
+      ":names": {
+        ":speak!": "speak"
+      },
+      ":target": {
+        "__edn_tag": "browser"
+      }
+    },
+    "ffi_edn": "{} (:backend :js) (:kind :external-object) (:target :browser)\n  :names $ {} $ :speak! |speak",
+    "id": "app.comp.container/SpeechSynthesisHost",
+    "js_ffi": null,
+    "schema": "'Trait",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "collect-readable-text",
+      [
+        "children",
+        "idx",
+        "acc"
+      ],
+      [
+        "if",
+        [
+          ">=",
+          "idx",
+          [
+            "children",
+            ":length"
+          ]
+        ],
+        "acc",
+        [
+          "match",
+          [
+            "child-element-at",
+            "children",
+            "idx"
+          ],
+          [
+            [
+              ":some",
+              "child"
+            ],
+            [
+              "recur",
+              "children",
+              [
+                "inc",
+                "idx"
+              ],
+              [
+                "if",
+                [
+                  "not=",
+                  [
+                    "child",
+                    ":local-name"
+                  ],
+                  "|pre"
+                ],
+                [
+                  "match",
+                  [
+                    "js-nullish->option",
+                    [
+                      "child",
+                      ":text-content"
+                    ]
+                  ],
+                  [
+                    [
+                      ":some",
+                      "text"
+                    ],
+                    [
+                      "conj",
+                      "acc",
+                      "text"
+                    ]
+                  ],
+                  [
+                    [
+                      ":none"
+                    ],
+                    "acc"
+                  ]
+                ],
+                "acc"
+              ]
+            ]
+          ],
+          [
+            [
+              ":none"
+            ],
+            [
+              "recur",
+              "children",
+              [
+                "inc",
+                "idx"
+              ],
+              "acc"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/collect-readable-text",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'js-ffi.browser/DomChildrenHost",
+          "'Number",
+          [
+            "::",
+            "'List",
+            "'String"
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ],
+      [
+        ":return",
+        [
+          "::",
+          "'List",
+          "'String"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defcomp",
+      "comp-container",
+      [
+        "reel"
+      ],
+      [
+        "let",
+        [
+          [
+            "store",
+            [
+              ":store",
+              "reel"
+            ]
+          ],
+          [
+            "states",
+            [
+              ":states",
+              "store"
+            ]
+          ],
+          [
+            "preview?",
+            [
+              ":preview?",
+              "store"
+            ]
+          ]
+        ],
+        [
+          "div",
+          [
+            "{}",
+            [
+              ":class-name",
+              "style-container"
+            ]
+          ],
+          [
+            "div",
+            [
+              "{}",
+              [
+                ":id",
+                "|article"
+              ],
+              [
+                ":style",
+                [
+                  "merge",
+                  "ui/flex",
+                  [
+                    "{}",
+                    [
+                      ":padding",
+                      [
+                        "if",
+                        "preview?",
+                        "|40px 240px 240px 240px",
+                        "|16px 16px 240px 16px"
+                      ]
+                    ],
+                    [
+                      ":flex-shrink",
+                      "0"
+                    ],
+                    [
+                      ":overflow",
+                      ":auto"
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "comp-md-block",
+              [
+                ":content",
+                "store"
+              ],
+              [
+                "{}",
+                [
+                  ":css",
+                  "|"
+                ],
+                [
+                  ":style",
+                  [
+                    "{}",
+                    [
+                      ":font-size",
+                      "16"
+                    ]
+                  ]
+                ],
+                [
+                  ":highlight",
+                  [
+                    "fn",
+                    [
+                      "code",
+                      "lang"
+                    ],
+                    [
+                      "hint-fn",
+                      [
+                        "{}",
+                        [
+                          ":args",
+                          [
+                            "[]",
+                            "'String",
+                            "'String"
+                          ]
+                        ],
+                        [
+                          ":return",
+                          "'String"
+                        ]
+                      ]
+                    ],
+                    [
+                      "highlight-code",
+                      "code",
+                      "lang"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "if",
+            [
+              "not",
+              "preview?"
+            ],
+            [
+              "textarea",
+              [
+                "{}",
+                [
+                  ":class-name",
+                  "css-textbox"
+                ],
+                [
+                  ":value",
+                  [
+                    ":content",
+                    "store"
+                  ]
+                ],
+                [
+                  ":placeholder",
+                  "|Markdown syntax supported~"
+                ],
+                [
+                  ":on-input",
+                  [
+                    "fn",
+                    [
+                      "e",
+                      "d!"
+                    ],
+                    [
+                      "hint-fn",
+                      [
+                        "{}",
+                        [
+                          ":args",
+                          [
+                            "[]",
+                            [
+                              "::",
+                              "'Map",
+                              "'Tag",
+                              "'Dynamic"
+                            ],
+                            [
+                              "::",
+                              "'Fn",
+                              [
+                                "{}",
+                                [
+                                  ":args",
+                                  [
+                                    "[]",
+                                    "'Enum"
+                                  ]
+                                ],
+                                [
+                                  ":return",
+                                  "'Unit"
+                                ]
+                              ]
+                            ]
+                          ]
+                        ],
+                        [
+                          ":return",
+                          "'Unit"
+                        ]
+                      ]
+                    ],
+                    [
+                      "d!",
+                      [
+                        "Op",
+                        ":content",
+                        [
+                          "decode-map-as",
+                          [
+                            ".unwrap",
+                            [
+                              "get",
+                              "e",
+                              ":value"
+                            ]
+                          ],
+                          "'String"
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  ":autofocus",
+                  "true"
+                ]
+              ]
+            ]
+          ],
+          [
+            "div",
+            [
+              "{}"
+            ],
+            [
+              "div",
+              [
+                "{}",
+                [
+                  ":style",
+                  [
+                    "{}",
+                    [
+                      ":position",
+                      ":fixed"
+                    ],
+                    [
+                      ":top",
+                      "0"
+                    ],
+                    [
+                      ":right",
+                      "0"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "div",
+                [
+                  "{}",
+                  [
+                    ":class-name",
+                    "css-icon"
+                  ],
+                  [
+                    ":on-click",
+                    [
+                      "fn",
+                      [
+                        "e",
+                        "d!"
+                      ],
+                      [
+                        "d!",
+                        [
+                          "Op",
+                          ":toggle"
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "comp-i",
+                  ":film",
+                  "14",
+                  [
+                    "hsl",
+                    "200",
+                    "80",
+                    "80"
+                  ]
+                ]
+              ],
+              [
+                "div",
+                [
+                  "{}",
+                  [
+                    ":class-name",
+                    "css-icon"
+                  ],
+                  [
+                    ":on-click",
+                    [
+                      "fn",
+                      [
+                        "e",
+                        "d!"
+                      ],
+                      [
+                        "read-from-dom!"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "comp-i",
+                  ":volume-2",
+                  "14",
+                  [
+                    "hsl",
+                    "200",
+                    "80",
+                    "80"
+                  ]
+                ]
+              ]
+            ],
+            [
+              "div",
+              [
+                "{}",
+                [
+                  ":style",
+                  [
+                    "merge",
+                    "ui/center",
+                    [
+                      "{}",
+                      [
+                        ":width",
+                        "40"
+                      ],
+                      [
+                        ":height",
+                        "40"
+                      ],
+                      [
+                        ":position",
+                        ":fixed"
+                      ],
+                      [
+                        ":right",
+                        "0"
+                      ],
+                      [
+                        ":bottom",
+                        "0"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "a",
+                [
+                  "{}",
+                  [
+                    ":href",
+                    "|https://github.com/Memkits/markdown-editor"
+                  ],
+                  [
+                    ":target",
+                    "|_blank"
+                  ]
+                ],
+                [
+                  "comp-i",
+                  ":github",
+                  "14",
+                  [
+                    "hsl",
+                    "200",
+                    "80",
+                    "80"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "comp-typed-reel",
+            [
+              ">>",
+              "states",
+              ":reel"
+            ],
+            "reel",
+            [
+              "{}"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/comp-container",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'respo.schema/Component"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'reel.typed/State",
+            "'app.schema/Op",
+            "'app.schema/Store"
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstyle",
+      "css-icon",
+      [
+        "{}",
+        [
+          "|$0",
+          [
+            "merge",
+            "ui/center",
+            [
+              "{}",
+              [
+                ":width",
+                "40"
+              ],
+              [
+                ":height",
+                "40"
+              ],
+              [
+                ":cursor",
+                ":pointer"
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/css-icon",
+    "js_ffi": null,
+    "schema": "'String",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstyle",
+      "css-textbox",
+      [
+        "{}",
+        [
+          "|$0",
+          [
+            "merge",
+            "ui/textarea",
+            "ui/flex",
+            [
+              "{}",
+              [
+                ":resize",
+                ":none"
+              ],
+              [
+                ":flex-shrink",
+                "0"
+              ],
+              [
+                ":font-family",
+                "ui/font-code"
+              ],
+              [
+                ":padding-bottom",
+                "240"
+              ],
+              [
+                ":padding",
+                "16"
+              ],
+              [
+                ":border-width",
+                "|0 0 0 1px"
+              ],
+              [
+                ":border-color",
+                [
+                  "hsl",
+                  "0",
+                  "0",
+                  "95"
+                ]
+              ],
+              [
+                ":border-style",
+                ":solid"
+              ],
+              [
+                ":background-color",
+                [
+                  "hsl",
+                  "0",
+                  "0",
+                  "98"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/css-textbox",
+    "js_ffi": null,
+    "schema": "'String",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "highlight-code",
+      [
+        "code",
+        "lang"
+      ],
+      [
+        "if",
+        [
+          "contains?",
+          "supported-langs",
+          "lang"
+        ],
+        [
+          "let",
+          [
+            [
+              "host",
+              [
+                "unsafe-coerce",
+                "hljs",
+                "HighlightHost"
+              ]
+            ],
+            [
+              "result",
+              [
+                ".highlight",
+                "host",
+                "code",
+                [
+                  "js-object",
+                  [
+                    ":language",
+                    [
+                      "option:unwrap",
+                      [
+                        "get",
+                        "supported-langs",
+                        "lang"
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "result",
+            ":value"
+          ]
+        ],
+        [
+          "contract/expect-string",
+          "|escaped-code",
+          [
+            "escape-html",
+            "code"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/highlight-code",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'String"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'String",
+          "'String"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "read-from-dom!",
+      [],
+      [
+        "let",
+        [
+          [
+            "article",
+            [
+              "option:unwrap",
+              [
+                "query-selector",
+                "|#article > *"
+              ]
+            ]
+          ],
+          [
+            "children",
+            [
+              "article",
+              ":children"
+            ]
+          ],
+          [
+            "text",
+            [
+              "join-string",
+              [
+                "collect-readable-text",
+                "children",
+                "0",
+                [
+                  "[]"
+                ]
+              ],
+              "&newline"
+            ]
+          ]
+        ],
+        [
+          "if-let",
+          [
+            "key",
+            [
+              "get-env",
+              "|azure-key"
+            ]
+          ],
+          [
+            "speechQueue",
+            "text",
+            "key",
+            "|en-US",
+            [
+              "fn",
+              [],
+              "&unit"
+            ]
+          ],
+          [
+            "speak-text!",
+            "text"
+          ]
+        ],
+        "&unit"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/read-from-dom!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "speak-text!",
+      [
+        "text"
+      ],
+      [
+        "let",
+        [
+          [
+            "message",
+            [
+              "unsafe-coerce",
+              [
+                "new",
+                "js/SpeechSynthesisUtterance"
+              ],
+              "SpeechMessageHost"
+            ]
+          ],
+          [
+            "synthesis",
+            [
+              "unsafe-coerce",
+              "js/speechSynthesis",
+              "SpeechSynthesisHost"
+            ]
+          ]
+        ],
+        [
+          "js-set",
+          "message",
+          ":text",
+          "text"
+        ],
+        [
+          ".speak!",
+          "synthesis",
+          "message"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/speak-text!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'String"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstyle",
+      "style-container",
+      [
+        "{}",
+        [
+          "|$0",
+          [
+            "merge",
+            "ui/global",
+            "ui/row",
+            "ui/fullscreen",
+            [
+              "{}",
+              [
+                ":overflow",
+                "|hidden"
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/style-container",
+    "js_ffi": null,
+    "schema": "'String",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "supported-langs",
+      [
+        "{}",
+        [
+          "|clojure",
+          "|clojure"
+        ],
+        [
+          "|clj",
+          "|clojure"
+        ],
+        [
+          "|bash",
+          "|bash"
+        ],
+        [
+          "|js",
+          "|javascript"
+        ],
+        [
+          "|javascript",
+          "|javascript"
+        ],
+        [
+          "|html",
+          "|xml"
+        ],
+        [
+          "|xml",
+          "|xml"
+        ],
+        [
+          "|css",
+          "|css"
+        ],
+        [
+          "|coffeescript",
+          "|coffeescript"
+        ],
+        [
+          "|coffee",
+          "|coffeescript"
+        ],
+        [
+          "|ts",
+          "|typescript"
+        ],
+        [
+          "|typescript",
+          "|typescript"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/supported-langs",
+    "js_ffi": null,
+    "schema": [
+      "::",
+      "'Map",
+      "'String",
+      "'String"
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "dev?",
+      [
+        "let",
+        [
+          [
+            "mode",
+            [
+              "option:unwrap-or",
+              [
+                "get-env",
+                "|mode"
+              ],
+              "|release"
+            ]
+          ]
+        ],
+        [
+          "=",
+          "mode",
+          "|dev"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.config/dev?",
+    "js_ffi": null,
+    "schema": "'Bool",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "site",
+      [
+        "{}",
+        [
+          ":dev-ui",
+          "|http://localhost:8100/main-fonts.css"
+        ],
+        [
+          ":release-ui",
+          "|http://cdn.tiye.me/favored-fonts/main-fonts.css"
+        ],
+        [
+          ":cdn-url",
+          "|http://cdn.tiye.me/markdown-editor/"
+        ],
+        [
+          ":title",
+          "|Markdown Editor"
+        ],
+        [
+          ":icon",
+          "|http://cdn.tiye.me/logo/markdown-editor.png"
+        ],
+        [
+          ":storage-key",
+          "|markdown-editor"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.config/site",
+    "js_ffi": null,
+    "schema": [
+      "::",
+      "'Map",
+      "'Tag",
+      "'String"
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defref",
+      "*reel",
+      [
+        "typed/new-reel",
+        "schema/store"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/*reel",
+    "js_ffi": null,
+    "schema": [
+      "::",
+      "'Ref",
+      [
+        "::",
+        "'reel.typed/State",
+        "'app.schema/Op",
+        "'app.schema/Store"
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "deftrait",
+      "HighlightHost",
+      [
+        ".register-language!",
+        [
+          "::",
+          "'Fn",
+          [
+            "{}",
+            [
+              ":args",
+              [
+                "[]",
+                "'app.main/HighlightHost",
+                "'String",
+                "'JsObject"
+              ]
+            ],
+            [
+              ":return",
+              "'Unit"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": {
+      ":backend": {
+        "__edn_tag": "js"
+      },
+      ":kind": {
+        "__edn_tag": "external-object"
+      },
+      ":names": {
+        ":register-language!": "registerLanguage"
+      },
+      ":target": {
+        "__edn_tag": "browser"
+      }
+    },
+    "ffi_edn": "{} (:backend :js) (:kind :external-object) (:target :browser)\n  :names $ {} $ :register-language! |registerLanguage",
+    "id": "app.main/HighlightHost",
+    "js_ffi": null,
+    "schema": "'Trait",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "dispatch!",
+      [
+        "op"
+      ],
+      [
+        "if",
+        [
+          "enum?",
+          "op"
+        ],
+        [
+          "do",
+          [
+            "when",
+            "config/dev?",
+            [
+              "println",
+              "|Dispatch:",
+              "op"
+            ]
+          ],
+          [
+            "match",
+            [
+              "typed/decode-control",
+              "op"
+            ],
+            [
+              [
+                ":some",
+                "control"
+              ],
+              [
+                "reset!",
+                "*reel",
+                [
+                  "typed/apply-control",
+                  "updater",
+                  "@*reel",
+                  "control"
+                ]
+              ]
+            ],
+            [
+              [
+                ":none"
+              ],
+              [
+                "reset!",
+                "*reel",
+                [
+                  "typed/record-op",
+                  "updater",
+                  "@*reel",
+                  [
+                    "schema/decode-op",
+                    "op"
+                  ],
+                  [
+                    "generate-id!"
+                  ],
+                  [
+                    "now-ms"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          "&unit"
+        ],
+        [
+          "raise",
+          "|Expected-Enum-operation"
+        ]
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/dispatch!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "main!",
+      [],
+      [
+        "println",
+        "|Running mode:",
+        [
+          "if",
+          "config/dev?",
+          "|dev",
+          "|release"
+        ]
+      ],
+      [
+        "if",
+        "config/dev?",
+        [
+          "load-console-formatter!"
+        ]
+      ],
+      [
+        "register-language!",
+        "|clojure",
+        "clojure-lang"
+      ],
+      [
+        "register-language!",
+        "|bash",
+        "bash-lang"
+      ],
+      [
+        "register-language!",
+        "|coffeescript",
+        "coffeescript-lang"
+      ],
+      [
+        "register-language!",
+        "|javascript",
+        "javascript-lang"
+      ],
+      [
+        "register-language!",
+        "|css",
+        "css-lang"
+      ],
+      [
+        "register-language!",
+        "|xml",
+        "xml-lang"
+      ],
+      [
+        "register-language!",
+        "|typescript",
+        "typescript-lang"
+      ],
+      [
+        "render-app!"
+      ],
+      [
+        "add-watch!",
+        "*reel",
+        ":changes",
+        [
+          "fn",
+          [
+            "r",
+            "p"
+          ],
+          [
+            "render-app!"
+          ]
+        ]
+      ],
+      [
+        "listen-devtools!",
+        "|a",
+        "dispatch!"
+      ],
+      [
+        "add-event-listener!",
+        "|beforeunload",
+        [
+          "fn",
+          [
+            "_"
+          ],
+          [
+            "persist-storage!"
+          ]
+        ]
+      ],
+      [
+        "add-event-listener!",
+        "|keydown",
+        "on-window-keydown"
+      ],
+      [
+        "set-interval!",
+        "persist-storage!",
+        "60000"
+      ],
+      [
+        "match",
+        [
+          "storage-get",
+          [
+            ".unwrap",
+            [
+              "get",
+              "config/site",
+              ":storage-key"
+            ]
+          ]
+        ],
+        [
+          [
+            ":some",
+            "raw"
+          ],
+          [
+            "match",
+            [
+              "schema/decode-store",
+              [
+                "parse-cirru-edn",
+                "raw"
+              ]
+            ],
+            [
+              [
+                ":some",
+                "stored"
+              ],
+              [
+                "dispatch!",
+                [
+                  "schema/Op",
+                  ":hydrate-storage",
+                  "stored"
+                ]
+              ]
+            ],
+            [
+              [
+                ":none"
+              ],
+              [
+                "eprintln",
+                "|Invalid stored Markdown editor state"
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            ":none"
+          ],
+          "&unit"
+        ]
+      ],
+      [
+        "println",
+        "|App started."
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/main!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "mount-target",
+      [],
+      [
+        "narrow-element",
+        [
+          "option:unwrap",
+          [
+            "query-selector",
+            "|.app"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/mount-target",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'respo.dom/DomElement"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "on-window-keydown",
+      [
+        "event"
+      ],
+      [
+        "let",
+        [
+          [
+            "keyboard",
+            [
+              "unsafe-coerce",
+              "event",
+              "js-ffi.browser/KeyboardEventHost"
+            ]
+          ]
+        ],
+        [
+          "when",
+          [
+            "and",
+            [
+              "=",
+              "|e",
+              [
+                "keyboard",
+                ":key"
+              ]
+            ],
+            [
+              "keyboard",
+              ":meta-key?"
+            ]
+          ],
+          [
+            "dispatch!",
+            [
+              "schema/Op",
+              ":toggle"
+            ]
+          ]
+        ]
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/on-window-keydown",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'js-ffi.browser/EventHost"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "persist-storage!",
+      [],
+      [
+        "storage-set!",
+        [
+          ".unwrap",
+          [
+            "get",
+            "config/site",
+            ":storage-key"
+          ]
+        ],
+        [
+          "format-cirru-edn",
+          [
+            ":store",
+            "@*reel"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/persist-storage!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "register-language!",
+      [
+        "name",
+        "language"
+      ],
+      [
+        "let",
+        [
+          [
+            "host",
+            [
+              "unsafe-coerce",
+              "hljs",
+              "HighlightHost"
+            ]
+          ]
+        ],
+        [
+          ".register-language!",
+          "host",
+          "name",
+          "language"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/register-language!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'String",
+          "'JsObject"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "reload!",
+      [],
+      [
+        "if",
+        [
+          "nil?",
+          "build-errors"
+        ],
+        [
+          "do",
+          [
+            "remove-watch!",
+            "*reel",
+            ":changes"
+          ],
+          [
+            "clear-cache!"
+          ],
+          [
+            "add-watch!",
+            "*reel",
+            ":changes",
+            [
+              "fn",
+              [
+                "reel",
+                "prev"
+              ],
+              [
+                "render-app!"
+              ]
+            ]
+          ],
+          [
+            "reset!",
+            "*reel",
+            [
+              "typed/refresh",
+              "updater",
+              "@*reel",
+              "schema/store"
+            ]
+          ],
+          [
+            "hud!",
+            "|ok~",
+            "|Ok"
+          ],
+          "&unit"
+        ],
+        [
+          "do",
+          [
+            "hud!",
+            "|error",
+            "build-errors"
+          ],
+          "&unit"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/reload!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "render-app!",
+      [],
+      [
+        "render!",
+        [
+          "mount-target"
+        ],
+        [
+          "comp-container",
+          "@*reel"
+        ],
+        "dispatch!"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/render-app!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defenum",
+      "Op",
+      [
+        ":states",
+        [
+          "::",
+          "'List",
+          "'Dynamic"
+        ],
+        "'Dynamic"
+      ],
+      [
+        ":content",
+        "'String"
+      ],
+      [
+        ":hydrate-storage",
+        "'app.schema/Store"
+      ],
+      [
+        ":toggle"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/Op",
+    "js_ffi": null,
+    "schema": "'EnumDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstruct",
+      "Store",
+      [
+        ":states",
+        [
+          "::",
+          "'Map",
+          "'Dynamic",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":content",
+        "'String"
+      ],
+      [
+        ":preview?",
+        "'Bool"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/Store",
+    "js_ffi": null,
+    "schema": "'StructDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "decode-op",
+      [
+        "op"
+      ],
+      [
+        "match",
+        "op",
+        [
+          [
+            ":states",
+            "cursor",
+            "state"
+          ],
+          [
+            "Op",
+            ":states",
+            [
+              "decode-map-as",
+              "cursor",
+              [
+                "::",
+                "'List",
+                "'Dynamic"
+              ]
+            ],
+            "state"
+          ]
+        ],
+        [
+          [
+            ":content",
+            "content"
+          ],
+          [
+            "Op",
+            ":content",
+            [
+              "decode-map-as",
+              "content",
+              "'String"
+            ]
+          ]
+        ],
+        [
+          [
+            ":hydrate-storage",
+            "data"
+          ],
+          [
+            "Op",
+            ":hydrate-storage",
+            [
+              ".unwrap",
+              [
+                "decode-store",
+                "data"
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            ":toggle"
+          ],
+          [
+            "Op",
+            ":toggle"
+          ]
+        ],
+        [
+          "_",
+          [
+            "raise",
+            "|Invalid-business-operation"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/decode-op",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'app.schema/Op"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Enum"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "decode-store",
+      [
+        "data"
+      ],
+      [
+        "if",
+        [
+          "struct?",
+          "data"
+        ],
+        [
+          "if",
+          [
+            "&struct:matches?",
+            "data",
+            "Store"
+          ],
+          [
+            "match",
+            [
+              "try-decode-map-as",
+              [
+                "&struct:to-map",
+                "data"
+              ],
+              "Store"
+            ],
+            [
+              [
+                ":ok",
+                "_"
+              ],
+              [
+                "Option",
+                ":some",
+                [
+                  "assert-type",
+                  "data",
+                  "'app.schema/Store"
+                ]
+              ]
+            ],
+            [
+              [
+                ":err",
+                "_"
+              ],
+              [
+                "Option",
+                ":none"
+              ]
+            ]
+          ],
+          [
+            "Option",
+            ":none"
+          ]
+        ],
+        [
+          "match",
+          [
+            "try-decode-map-as",
+            "data",
+            "Store"
+          ],
+          [
+            [
+              ":ok",
+              "stored"
+            ],
+            [
+              "Option",
+              ":some",
+              "stored"
+            ]
+          ],
+          [
+            [
+              ":err",
+              "_"
+            ],
+            [
+              "Option",
+              ":none"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/decode-store",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":return",
+        [
+          "::",
+          "'Option",
+          "'app.schema/Store"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "store",
+      [
+        "Store",
+        ":states",
+        [
+          "{}"
+        ],
+        ":content",
+        "|",
+        ":preview?",
+        "false"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/store",
+    "js_ffi": null,
+    "schema": "'app.schema/Store",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "updater",
+      [
+        "store",
+        "op",
+        "op-id",
+        "op-time"
+      ],
+      [
+        "match",
+        "op",
+        [
+          [
+            ":states",
+            "cursor",
+            "s"
+          ],
+          [
+            "assoc",
+            "store",
+            ":states",
+            [
+              "decode-map-as",
+              [
+                "update-state-tree",
+                [
+                  ":states",
+                  "store"
+                ],
+                "cursor",
+                "s"
+              ],
+              [
+                "::",
+                "'Map",
+                "'Dynamic",
+                "'Dynamic"
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            ":content",
+            "c"
+          ],
+          [
+            "assoc",
+            "store",
+            ":content",
+            "c"
+          ]
+        ],
+        [
+          [
+            ":hydrate-storage",
+            "d"
+          ],
+          "d"
+        ],
+        [
+          [
+            ":toggle"
+          ],
+          [
+            "update",
+            "store",
+            ":preview?",
+            "not"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.updater/updater",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'app.schema/Store"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'app.schema/Store",
+          "'app.schema/Op",
+          "'String",
+          "'Number"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  }
+]

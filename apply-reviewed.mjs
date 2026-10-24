@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+const run=(...a)=>execFileSync('calcit',a,{encoding:'utf8',maxBuffer:32e6,stdio:['ignore','pipe','pipe']});
+const norm=v=>Array.isArray(v)?v.map(norm):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,k==='__edn_set'?x.map(norm).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))):norm(x)])):v;
+const q=(...a)=>norm(JSON.parse(run('query',...a,'--format','json')).data);
+const blob=()=>execFileSync('git',['hash-object','calcit.cirru'],{encoding:'utf8'}).trim();
+mkdirSync('acceptance',{recursive:true});assert.equal(run('-v').trim(),'0.30.1');assert.equal(blob(),'f2c3380eaddd36a51a6eb8d82bec1675fcbb0dd3');writeFileSync('acceptance/agent-contract.txt',run('docs','agents','--contract'));
+const before=norm(JSON.parse(readFileSync('reviewed.json','utf8'))),expected=structuredClone(before),ops=[],evidence=[];
+assert.equal(before.length,33);assert.equal(before.reduce((n,d)=>n+d.tests.length,0),0);assert.equal(before.reduce((n,d)=>n+d.examples.length,0),0);
+const config=q('config'),namespaces=q('ns').namespaces.map(n=>q('ns',n));
+const renames={'merge':'.merge','option:unwrap':'.unwrap','option:unwrap-or':'.unwrap-or'};let callHeads=0;
+function walk(x,path,id){
+  if(!Array.isArray(x)||['quote','quasiquote',';','comment','defmacro'].includes(x[0]))return;
+  if(renames[x[0]]){
+    assert.deepEqual(JSON.parse(run('tree','show',id,'--path','@'+path.join('.'),'--format','json')).tree,x);
+    if(x[0]==='merge'){assert.ok(['ui/global','ui/flex','ui/textarea','ui/center'].includes(x[1]));const d=q('def','respo-ui.core/'+x[1].slice(3));assert.deepEqual(d.schema,['::',"'Map","'Tag","'Dynamic"]);evidence.push({id,path,receiver:x[1],schema:d.schema});}
+    ops.push(['tree','replace',id,'--path','@'+[...path,0].join('.'),'--input-format','json-ast','--code',JSON.stringify(renames[x[0]]),'--expect','quote '+x[0]]);x[0]=renames[x[0]];callHeads++;
+  }
+  x.forEach((v,i)=>walk(v,[...path,i],id));
+}
+for(const d of expected){assert.deepEqual(q('def',d.id),before.find(x=>x.id===d.id));walk(d.code,[],d.id);}
+assert.equal(callHeads,9);
+function replace(id,path,old,value){const d=expected.find(d=>d.id===id);let node=d.code;for(const i of path.slice(0,-1))node=node[i];assert.deepEqual(node[path.at(-1)],old);assert.deepEqual(JSON.parse(run('tree','show',id,'--path','@'+path.join('.'),'--format','json')).tree,old);node[path.at(-1)]=value;ops.push(['tree','replace',id,'--path','@'+path.join('.'),'--input-format','json-ast','--code',JSON.stringify(value)]);}
+replace('app.comp.container/speak-text!',[3],['let',[['message',['unsafe-coerce',['new','js/SpeechSynthesisUtterance'],'SpeechMessageHost']],['synthesis',['unsafe-coerce','js/speechSynthesis','SpeechSynthesisHost']]],['js-set','message',':text','text'],['.speak!','synthesis','message']],['speech-synthesis-speak!','text']);
+replace('app.main/on-window-keydown',[3,1,0,1],['unsafe-coerce','event','js-ffi.browser/KeyboardEventHost'],['keyboard-event-host','event']);
+const removedIds=['app.comp.container/SpeechMessageHost','app.comp.container/SpeechSynthesisHost'];
+const refs=[];function leaf(x,id){if(Array.isArray(x))x.forEach(v=>leaf(v,id));else if(typeof x==='string'&&['SpeechMessageHost','SpeechSynthesisHost'].some(n=>x.includes(n)))refs.push({id,x});}for(const d of expected)if(!removedIds.includes(d.id)){leaf(d.code,d.id);leaf(d.schema,d.id);leaf(d.examples,d.id);leaf(d.tests,d.id);}assert.deepEqual(refs,[]);
+for(const id of removedIds){const d=expected.find(d=>d.id===id);assert.equal(d.code[0],'deftrait');assert.equal(d.tests.length,0);assert.equal(d.examples.length,0);ops.push(['edit','rm-def',id]);expected.splice(expected.indexOf(d),1);}namespaces.find(n=>n.namespace==='app.comp.container').definition_count-=2;
+for(const [name,helper] of [['app.main','keyboard-event-host'],['app.comp.container','speech-synthesis-speak!']]){const ns=namespaces.find(n=>n.namespace===name),i=ns.ns_code[2].findIndex(x=>Array.isArray(x)&&x[0]==='js-ffi.browser'),rule=structuredClone(ns.ns_code[2][i]);assert.equal(rule[1],':refer');assert.ok(!rule[2].includes(helper));rule[2].push(helper);ns.ns_code[2][i]=rule;ops.push(['edit','add-import',name,'--overwrite','--input-format','json-ast','--code',JSON.stringify(rule)]);evidence.push(q('def','js-ffi.browser/'+helper));}
+const main=expected.find(d=>d.id==='app.main/main!'),old=structuredClone(main.code);assert.equal(old.length,20);assert.deepEqual(old[12],['render-app!']);assert.equal(old[15][0],'add-event-listener!');assert.equal(old[15][1],'|beforeunload');assert.equal(old[17][0],'set-interval!');assert.equal(old[18][0],'match');
+const restore=structuredClone(old[18]);assert.deepEqual(restore[2][1][3][1],['eprintln','|Invalid stored Markdown editor state']);restore[2][1][3][1]=['raise','|Invalid stored Markdown editor state; existing archive is kept'];assert.deepEqual(JSON.parse(run('tree','show',main.id,'--path','@18','--format','json')).tree,old[18]);ops.push(['tree','replace',main.id,'--path','@18','--input-format','json-ast','--code',JSON.stringify(restore)]);for(const i of [18,17,16,15,14,13])ops.push(['tree','swap',main.id,'--path','@'+i,'--with','prev']);main.code=[...old.slice(0,12),restore,...old.slice(12,18),...old.slice(19)];
+assert.equal(ops.length,22);writeFileSync('acceptance/before.json',JSON.stringify(before,null,2));writeFileSync('acceptance/receivers.json',JSON.stringify(evidence,null,2));writeFileSync('acceptance/operations.json',JSON.stringify(ops,null,2));
+const args=['edit','transaction','--file','acceptance/operations.json','--format','json'],preview=JSON.parse(run(...args,'--dry-run'));assert.ok(preview.scoped_revision);writeFileSync('acceptance/transaction-preview.json',JSON.stringify(preview,null,2));writeFileSync('acceptance/transaction-applied.json',run(...args,'--expect-revision',preview.scoped_revision));
+const after=[];for(const ns of namespaces){const names=run('query','defs',ns.namespace).split('\n').filter(x=>/^  \S/.test(x)).map(x=>x.trim().split(' ')[0]);assert.equal(names.length,ns.definition_count);for(const n of names)after.push(q('def',`${ns.namespace}/${n}`));}assert.deepEqual(after,expected);assert.deepEqual(q('config'),config);assert.deepEqual(q('ns').namespaces.map(n=>q('ns',n)),namespaces);
+writeFileSync('acceptance/after.json',JSON.stringify(after,null,2));writeFileSync('acceptance/snapshot-after-blob.txt',blob());writeFileSync('acceptance/summary.json',JSON.stringify({callHeads,operations:ops.length,definitions:after.length,attachedTests:0,examples:0,unsafeBefore:5,unsafeAfter:2,preserved:'All retained definition schemas/FFI/meta/tests/examples/config and actual hud! unchanged. Private redundant speech traits replaced by published speechString helper; no cancellation/queue policy change, no Azure call. Keyboard host runtime validated. Existing typed Store/Op/Reel/decode identity and heterogeneous state contracts intact. Restores before first render/watch/exit/interval save; parse/invalidStore/render failure prevents autosave registration. No extra definition/test/budget/checker/fix rule.'},null,2));
