@@ -64,28 +64,34 @@
                         hint-fn $ Fn String String $ -> String
                         highlight-code code lang
                 if (not preview?)
-                  textarea $ {} (:class-name css-textbox)
+                  Option :some $ textarea $ {} (:class-name css-textbox)
                     :value $ :content store
                     :placeholder "|Markdown syntax supported~"
                     :on-input $ fn (e d!)
-                      hint-fn $ Fn (Map Tag Dynamic)
+                      hint-fn $ Fn respo.schema/RespoEvent
                         Fn Enum $ -> Unit
                         -> Unit
-                      d! $ Op :content $ decode-map-as
-                        .unwrap $ get e :value
-                        , 'String
+                      d! $ Op :content $ decode-map-as (:value e) 'String
                     :autofocus true
+                  Option :none
                 div ({})
                   div
                     {} $ :style $ {} (:position :fixed) (:top 0) (:right 0)
                     div
                       {} (:class-name css-icon)
                         :on-click $ fn (e d!)
+                          hint-fn $ Fn respo.schema/RespoEvent
+                            Fn Enum $ -> Unit
+                            -> Unit
                           d! $ Op :toggle
                       comp-i :film 14 $ hsl 200 80 80
                     div
                       {} (:class-name css-icon)
-                        :on-click $ fn (e d!) (read-from-dom!)
+                        :on-click $ fn (e d!)
+                          hint-fn $ Fn respo.schema/RespoEvent
+                            Fn Enum $ -> Unit
+                            -> Unit
+                          read-from-dom!
                       comp-i :volume-2 14 $ hsl 200 80 80
                   div
                     {} $ :style $ .merge ui/center
@@ -115,7 +121,7 @@
           :code $ quote $ defn highlight-code (code lang)
             if (contains? supported-langs lang)
               let
-                  host $ unsafe-coerce hljs HighlightHost
+                  host $ js-cast hljs 'app.comp.container/HighlightHost
                   result $ .highlight host code $ js-object
                     :language $ .unwrap $ get supported-langs lang
                 result :value
@@ -197,16 +203,19 @@
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :register-language! |registerLanguage
           :schema $ quote Trait
+        'decode-dispatch $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn decode-dispatch (op)
+            match (typed/decode-control op)
+              (:some control) control
+              (:none) (schema/decode-op op)
+          :examples $ []
+          :schema $ quote $ Fn Enum (-> app.schema/ResolvedOp)
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
             if (enum? op)
               do
                 when config/dev? $ println |Dispatch: op
-                match (typed/decode-control op)
-                  (:some control)
-                    reset! *reel $ typed/apply-control updater @*reel control
-                  (:none)
-                    reset! *reel $ typed/record-op updater @*reel (schema/decode-op op) (generate-id!) (now-ms)
+                reset! *reel $ next-reel $ decode-dispatch op
                 , &unit
               raise |Expected-Enum-operation
             , &unit
@@ -247,6 +256,16 @@
             narrow-element $ .unwrap $ query-selector |.app
           :examples $ []
           :schema $ quote $ Fn (-> respo.dom/DomElement) (:features :js-ffi)
+        'next-reel $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn next-reel (op)
+            match op
+              (reel.typed/Control control) (typed/apply-control updater @*reel control)
+              (app.schema/Op action)
+                typed/record-op updater @*reel action (generate-id!) (now-ms)
+          :examples $ []
+          :schema $ quote $ Fn app.schema/ResolvedOp
+            -> $ reel.typed/State app.schema/Op app.schema/Store
+            :features :js-ffi
         'on-window-keydown $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-window-keydown (event)
             let
@@ -269,7 +288,7 @@
         'register-language! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn register-language! (name language)
             let
-                host $ unsafe-coerce hljs HighlightHost
+                host $ js-cast hljs 'app.main/HighlightHost
               .register-language! host name language
           :examples $ []
           :schema $ quote $ Fn String JsObject (-> Unit) (:features :js-ffi)
@@ -286,7 +305,8 @@
           :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! ()
-            render! (mount-target) (comp-container @*reel)
+            render-with! (mount-target)
+              fn () $ comp-container @*reel
               fn (op)
                 hint-fn $ Fn Enum $ -> Unit
                 dispatch! op
@@ -295,7 +315,7 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.main
           :require
-            respo.core :refer $ render! clear-cache!
+            respo.core :refer $ render-with! clear-cache!
             app.comp.container :refer $ comp-container
             app.updater :refer $ updater
             app.schema :as schema
@@ -318,25 +338,28 @@
     'app.schema $ %{} 'FileEntry
       :defs $ {}
         'DispatchOp $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def DispatchOp
-            :: :states ([]) nil
+          :code $ quote $ def DispatchOp (:: :unhandled)
           :examples $ []
           :schema $ quote Enum
         'Op $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defenum Op
             :states
               quote $ List Dynamic
-              , 'Dynamic
-            :content 'String
-            :hydrate-storage 'app.schema/Store
+              , Dynamic
+            :content String
+            :hydrate-storage app.schema/Store
             :toggle
           :examples $ []
           :schema $ quote EnumDef
+        'ResolvedOp $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion ResolvedOp app.schema/Op reel.typed/Control
+          :examples $ []
+          :schema $ quote UnionDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
             :states $ quote $ Map Dynamic Dynamic
-            :content 'String
-            :preview? 'Bool
+            :content String
+            :preview? Bool
           :examples $ []
           :schema $ quote StructDef
         'decode-op $ %{} 'CodeEntry (:doc |)
@@ -344,7 +367,7 @@
             match op
               (:states cursor state)
                 Op :states
-                  decode-map-as cursor $ :: 'List 'Dynamic
+                  decode-map-as cursor $ quote $ List Dynamic
                   , state
               (:content content)
                 Op :content $ decode-map-as content 'String
@@ -383,7 +406,7 @@
               (:states cursor s)
                 assoc store :states $ decode-map-as
                   update-state-tree (:states store) cursor s
-                  :: 'Map 'Dynamic 'Dynamic
+                  quote $ Map Dynamic Dynamic
               (:content c) (assoc store :content c)
               (:hydrate-storage d) d
               (:toggle) (update store :preview? not)
