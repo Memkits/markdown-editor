@@ -4,7 +4,7 @@
 
 ## 使用者需要注意
 
-配对正式 **Calcit / @calcit/procs 0.34.2**、Caps 0.1.1、Node 24 和 Yarn 4.18.0。正式模块统一为 Markdown 0.7.1、Feather 0.6.0、Reel 0.9.0、Respo 0.19.2、UI 0.14.1、JS-FFI 0.2.10，传递 Router 0.11.2。升级后严格重装完整图、生成 JS 并刷新，不混用旧 runtime。
+配对正式 **Calcit / @calcit/procs 0.34.2**、Caps 0.1.1、Node 24.15.0 或更新的 24.x 和 Yarn 4.18.0。正式模块统一为 Markdown 0.7.1、Feather 0.6.0、Reel 0.9.0、Respo 0.19.2、UI 0.14.1、JS-FFI 0.2.10，传递 Router 0.11.2。升级后严格重装完整图、生成 JS 并刷新，不混用旧 runtime。
 
 原 Markdown 内容、预览切换、高亮语言、朗读策略、`markdown-editor` 存储键和部署路径保持。Store/Op 模型与 wire 恢复、合法本地 Store 的对象身份保持。启动仍先读取、解析、解码、hydrate 和首次渲染，再注册退出及定时保存；失败中止启动并保留原存档，不自动默认覆盖。坏存档可见提示仍单独跟踪于 [#68](https://github.com/Memkits/markdown-editor/issues/68)，本轮不宣称完成此界面需求。真实 JS `hud!` 成功/编译错误提示保留。
 
@@ -17,6 +17,8 @@
 - unsafe 2→0、codeNil 1→0，schemaDynamic 仍为两个真实入口；dynamic-method/deprecated 为零。不增加或放宽门禁、预算、编译器 fix/proof 规则，也不新增 checker、concurrently 或测试矩阵。
 
 原两项 Node 业务回归保留输入和断言，仅同步 RespoEvent 身份与帧入口，继续覆盖高亮、混合 cursor、存储往返和离线朗读。没有附带 native 测试，不把空集合记为通过。朗读实现不改；离线夹具不等同真实语音服务验收，本轮不点击浏览器朗读、不配置密钥、不请求 Azure。
+
+锁文件按原可选 fsevents 的 `node-gyp@latest` 约束刷新到正式 13.1.0，移除旧 glob/minimatch 构建依赖链；直接依赖、语音 SDK 与原包龄策略保持，不增加版本 override。
 
 ## 开发与验证
 
