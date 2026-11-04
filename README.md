@@ -4,20 +4,19 @@
 
 ## 使用者需要注意
 
-配对正式 **Calcit / @calcit/procs 0.32.1**、Caps0.1.1、Node24 和 Yarn4.18.0。直接模块使用正式 Markdown0.5.0、Feather0.5.0、Reel0.7.0、Respo0.17.1、UI0.9.0、JS FFI0.2.9；UI的Router0.9.0-alpha.4传递依赖保留，不引用main/hash。升级后重装完整图、生成JS、重启并刷新，不混用旧runtime。
+配对正式 **Calcit / @calcit/procs 0.34.2**、Caps 0.1.1、Node 24 和 Yarn 4.18.0。正式模块统一为 Markdown 0.7.1、Feather 0.6.0、Reel 0.9.0、Respo 0.19.2、UI 0.14.1、JS-FFI 0.2.10，传递 Router 0.11.2。升级后严格重装完整图、生成 JS 并刷新，不混用旧 runtime。
 
-原Markdown内容、预览切换、支持的高亮语言、朗读策略、markdown-editor存储键和部署路径保持。已构造的合法本地Store继续保留对象身份；序列化后失去名义来源的Struct改为按数据恢复：转Map、完整检查Store字段，再构造本地Store，名称不代表身份。不放宽为任意Struct强转，也不改变Map/Struct存档格式。
-
-启动仍先读取/解析/解码/hydrate和首次渲染，再注册退出及定时保存。失败会中止启动、保留原值，不自动清空/默认覆盖；需修复后重新载入。原坏存档可见提示改进仍单独跟踪于 [#68](https://github.com/Memkits/markdown-editor/issues/68)，本轮正常恢复修正不等同完成该界面需求。真实JS `hud!` 成功/编译错误提示保留，不用raise替代。
+原 Markdown 内容、预览切换、高亮语言、朗读策略、`markdown-editor` 存储键和部署路径保持。Store/Op 模型与 wire 恢复、合法本地 Store 的对象身份保持。启动仍先读取、解析、解码、hydrate 和首次渲染，再注册退出及定时保存；失败中止启动并保留原存档，不自动默认覆盖。坏存档可见提示仍单独跟踪于 [#68](https://github.com/Memkits/markdown-editor/issues/68)，本轮不宣称完成此界面需求。真实 JS `hud!` 成功/编译错误提示保留。
 
 ## 本次迁移与风险
 
-- 官方formatter转换6处旧类型形式。29个既有完整官方视图仅render-app!和decode-store两处代码变化，所有既有schema/tests/meta保持；新增开放Enum的DispatchOp代表定义绑定原缺失入口槽，代表不发送。
-- 渲染回调以实际Enum→Unit合同转交原受检Dynamic派发入口，保留Reel控制解码和业务Op校验。业务/Store模型不改，不把匿名控制伪装成闭合业务Op。
-- 原两项业务回归实际抓到保存/解析/hydrate被拒绝，修复恢复边界而不改断言；本地Store字段校验及对象身份保留，外部Struct只在完整解码后变成本地值。新接受行为仅限字段合法的wire数据，错误字段仍拒绝，不信任来源或名称。
-- runtime/deps/lock对齐，npm包龄60分钟无单包例外。原CI/全部类型门禁、测试文件和断言、权限、正式Action tags及COS内置verify不变。不新增checker/concurrently、预算、编译器fix/proof规则或防御性测试矩阵。
+- 输入及点击回调使用实际 `RespoEvent`，输入值仍通过原 String 解码检查。预览模式下的缺席 textarea 使用 Option，浏览器根及原 HTML 回归在 managed memo frame 内构建/渲染。
+- 原受检派发入口保留非 Enum 拒绝、Reel 控制优先和业务解码顺序；解码后的 `ResolvedOp = Op | reel.typed/Control` 由内部函数穷尽匹配。两个真正开放的原始输入（dispatch、存档 decoder）仍显式使用 Dynamic，不把开放 UI 状态或外部数据伪装成业务 union。
+- 现有两个 Highlight.js external-object trait 通过 `js-cast` 检查所需方法，替代原 unsafe；合法导入行为不变，不合法宿主会更早失败。该检查只证明浅层成员存在/可调用，不证明语言插件或方法结果的深层合同。
+- 原 30 个定义全部保留，原 schema、附带元数据保持；新增 union 和两个内部派发函数。仅供入口槽使用、不会发送的 Enum 代表值移除无意义 nil payload，不改变真实 `:states` 数据合同。
+- unsafe 2→0、codeNil 1→0，schemaDynamic 仍为两个真实入口；dynamic-method/deprecated 为零。不增加或放宽门禁、预算、编译器 fix/proof 规则，也不新增 checker、concurrently 或测试矩阵。
 
-2处既有unsafe仍对应Highlight.js导入宿主身份，未扩大或伪造为零。朗读仍用原正式speech适配，不改变队列策略、不请求Azure；本轮不点击真实朗读或配置密钥，离线语音夹具不等同真实服务验收。
+原两项 Node 业务回归保留输入和断言，仅同步 RespoEvent 身份与帧入口，继续覆盖高亮、混合 cursor、存储往返和离线朗读。没有附带 native 测试，不把空集合记为通过。朗读实现不改；离线夹具不等同真实语音服务验收，本轮不点击浏览器朗读、不配置密钥、不请求 Azure。
 
 ## 开发与验证
 
@@ -31,15 +30,15 @@ yarn build
 node --test tests/*.test.mjs
 ```
 
-候选通过338个全定义、原五namespace公开30个定义、完整strict diagnostics=[]、零deprecated、canonical和构建。原两项业务回归保留全部断言，覆盖实际事件Map、高亮、混合cursor、存储往返和离线朗读。没有附带native测试，不把空集合计为通过。
+本地通过 349 个全定义、五个应用 namespace 的全部 33 个定义、完整 strict diagnostics=[]、零 deprecated/dynamic-method、canonical、严格模块图/工具链、immutable 安装、原两项 Node 回归及构建。新 npm 解析保留原 60 分钟包龄策略，无单包豁免；原 SDK chunk >500kB 提示保留。
 
-新回环来源实际验证标题、中英文/emoji、JavaScript关键字/数字高亮、预览图标、⌘E，以及内容/预览状态刷新恢复，浏览器warn/error=[]。不读取真实存档/文件，不操作剪贴板，不将历史坏存档/HUD注错验收记为重验；SDK的大chunk提示仍保留。
+全新回环来源、独立 Chrome 实际验证中英文/emoji、JavaScript 关键字高亮、预览图标、⌘E、内容和预览状态刷新恢复、Reel Reset，页面异常及 console warn/error 均为空。仅使用合成 Markdown 和该新来源的自动存档，不读取真实文件/存档，不操作剪贴板，不调用真实语音。启动/坏存档保护代码、HUD 和 HMR 实现未改；本轮未重新注入坏存档或编译错误验收。
 
-yarn dev编译一次再启动Vite，实时编辑另开终端运行calcit calcit.cirru -w。仅维护calcit.cirru/deps.cirru，Snapshot使用官方CLI，不恢复compact.cirru/package.cirru，不提交js-out/dist。
+`yarn dev` 编译一次后启动 Vite，实时编辑另开终端运行 `calcit calcit.cirru -w`。仅维护 `calcit.cirru` / `deps.cirru`，Snapshot 使用官方 CLI，不恢复 compact/package，不提交 js-out/dist。
 
 ## 前端部署
 
-VITE_BASE_URL控制资源前缀；生产仍Memkits/markdown-editor/，PR沿用独立编号/run/attempt前缀。COS仅dist/，正式v1.2.0 action内置HTML引用与公开字节校验，不复制脚本。原队列、过期main同时跳过COS/rsync的条件和服务器目的地保持；不宣称跨COS/rsync原子发布。不合并、不生产部署、不改后端、不发布Git/npm。
+`VITE_BASE_URL` 控制资源前缀；生产仍为 `Memkits/markdown-editor/`，PR 沿用独立编号/run/attempt 前缀。COS 仅 dist/，正式 v1.2.0 action 内置 verify，不复制脚本。工作流、队列、过期 main 同时跳过 COS/rsync 的条件和服务器目的地保持；不宣称跨 COS/rsync 原子发布。不合并、不生产部署、不改后端、不发布 Git/npm。
 
 ## License
 

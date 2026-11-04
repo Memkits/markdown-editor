@@ -8,6 +8,8 @@ import { store, Op, decode_store } from "../js-out/app.schema.mjs";
 import { updater } from "../js-out/app.updater.mjs";
 import { new_reel } from "../js-out/reel.typed.mjs";
 import { make_string } from "../js-out/respo.render.html.mjs";
+import { with_memo_frame } from "../js-out/respo.memo.mjs";
+import { RespoEvent } from "../js-out/respo.schema.mjs";
 import { component_$q_, component_tree, element_event, element_children, child_pair_value } from "../js-out/respo.util.detect.mjs";
 import { event__GT_edn } from "../js-out/respo.util.format.mjs";
 
@@ -62,18 +64,18 @@ function inputHandler(node) {
   return null;
 }
 
-test("actual input Map, Markdown rendering and mixed UI cursor retain content", () => {
+test("actual input RespoEvent, Markdown rendering and mixed UI cursor retain content", () => {
   main.register_language_$x_("javascript", javascript);
   let edited = store;
   const event = event__GT_edn({ type: "input", target: { value: content, checked: false } });
-  assert.ok(c.map_$q_(event));
-  inputHandler(app.comp_container(new_reel(store)))(event, (operation) => {
+  assert.ok(c._$n_struct_$o_matches_$q_(event, RespoEvent));
+  with_memo_frame(() => inputHandler(app.comp_container(new_reel(store))))(event, (operation) => {
     edited = updater(edited, operation, "fixture", 1);
   });
   const next = updater(edited, op("states", c._$L_(t.editor, 2), "draft"), "fixture2", 2);
   assert.equal(read(next, t.content), content);
   assert.equal(read(read(read(read(next, t.states), t.editor), 2), t.data), "draft");
-  const html = make_string(app.comp_container(new_reel(next)));
+  const html = with_memo_frame(() => make_string(app.comp_container(new_reel(next))));
   assert.ok(html.includes("Editor fixture"));
   assert.ok(html.includes("hljs-keyword"));
   assert.equal(app.highlight_code("<unknown>&", "unknown-language"), "&lt;unknown&gt;&amp;");
