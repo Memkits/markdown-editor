@@ -12,7 +12,7 @@
       :defs $ {}
         'HighlightHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait HighlightHost
-            .highlight $ quote $ Fn app.comp.container/HighlightHost String JsObject (-> app.comp.container/HighlightResultHost)
+            .highlight $ Fn app.comp.container/HighlightHost String JsObject $ -> app.comp.container/HighlightResultHost
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :highlight |highlight
@@ -198,7 +198,7 @@
           :schema $ quote $ Ref (reel.typed/State app.schema/Op app.schema/Store)
         'HighlightHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait HighlightHost
-            .register-language! $ quote $ Fn app.main/HighlightHost String JsObject (-> Unit)
+            .register-language! $ Fn app.main/HighlightHost String JsObject $ -> Unit
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :register-language! |registerLanguage
@@ -209,18 +209,14 @@
               (:some control) control
               (:none) (schema/decode-op op)
           :examples $ []
-          :schema $ quote $ Fn Enum (-> app.schema/ResolvedOp)
+          :schema $ quote $ Fn AnyEnum (-> app.schema/ResolvedOp)
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
-            if (enum? op)
-              do
-                when config/dev? $ println |Dispatch: op
-                reset! *reel $ next-reel $ decode-dispatch op
-                , &unit
-              raise |Expected-Enum-operation
+            when config/dev? $ println |Dispatch: op
+            reset! *reel $ next-reel $ decode-dispatch op
             , &unit
           :examples $ []
-          :schema $ quote $ Fn Dynamic (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn AnyEnum (-> Unit) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -340,12 +336,10 @@
         'DispatchOp $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def DispatchOp (:: :unhandled)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote AnyEnum
         'Op $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defenum Op
-            :states
-              quote $ List Dynamic
-              , Dynamic
+            :states (List respo.schema/CoordKey) Dynamic
             :content String
             :hydrate-storage app.schema/Store
             :toggle
@@ -357,7 +351,7 @@
           :schema $ quote UnionDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
-            :states $ quote $ Map Dynamic Dynamic
+            :states $ Map Dynamic Dynamic
             :content String
             :preview? Bool
           :examples $ []
@@ -367,7 +361,7 @@
             match op
               (:states cursor state)
                 Op :states
-                  decode-map-as cursor $ quote $ List Dynamic
+                  decode-map-as cursor $ List respo.schema/CoordKey
                   , state
               (:content content)
                 Op :content $ decode-map-as content 'String
@@ -376,7 +370,7 @@
               (:toggle) (Op :toggle)
               _ $ raise |Invalid-business-operation
           :examples $ []
-          :schema $ quote $ Fn Enum (-> app.schema/Op)
+          :schema $ quote $ Fn AnyEnum (-> app.schema/Op)
         'decode-store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn decode-store (data)
             if (struct? data)
@@ -406,7 +400,7 @@
               (:states cursor s)
                 assoc store :states $ decode-map-as
                   update-state-tree (:states store) cursor s
-                  quote $ Map Dynamic Dynamic
+                  Map Dynamic Dynamic
               (:content c) (assoc store :content c)
               (:hydrate-storage d) d
               (:toggle) (update store :preview? not)
