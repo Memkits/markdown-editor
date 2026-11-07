@@ -6,7 +6,7 @@
     {} (:description |) (:init-fn 'app.main/main!) (:mode :js) (:reload-fn 'app.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |respo-ui.calcit/ |respo-markdown.calcit/ |reel.calcit/ |respo-feather.calcit/ |js-ffi/
-      :type-slots $ {} $ :dispatch-op |app.schema/DispatchOp
+      :type-slots $ {} $ :dispatch-op 'app.schema/DispatchOp
   :files $ {}
     'app.comp.container $ %{} 'FileEntry
       :defs $ {}
@@ -69,7 +69,7 @@
                     :placeholder "|Markdown syntax supported~"
                     :on-input $ fn (e d!)
                       hint-fn $ Fn respo.schema/RespoEvent
-                        Fn Enum $ -> Unit
+                        Fn app.schema/Op $ -> Unit
                         -> Unit
                       d! $ Op :content $ decode-map-as (:value e) 'String
                     :autofocus true
@@ -81,7 +81,7 @@
                       {} (:class-name css-icon)
                         :on-click $ fn (e d!)
                           hint-fn $ Fn respo.schema/RespoEvent
-                            Fn Enum $ -> Unit
+                            Fn app.schema/Op $ -> Unit
                             -> Unit
                           d! $ Op :toggle
                       comp-i :film 14 $ hsl 200 80 80
@@ -89,7 +89,7 @@
                       {} (:class-name css-icon)
                         :on-click $ fn (e d!)
                           hint-fn $ Fn respo.schema/RespoEvent
-                            Fn Enum $ -> Unit
+                            Fn app.schema/Op $ -> Unit
                             -> Unit
                           read-from-dom!
                       comp-i :volume-2 14 $ hsl 200 80 80
@@ -213,10 +213,15 @@
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
             when config/dev? $ println |Dispatch: op
-            reset! *reel $ next-reel $ decode-dispatch op
+            reset! *reel $ next-reel op
             , &unit
           :examples $ []
-          :schema $ quote $ Fn AnyEnum (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn app.schema/ResolvedOp (-> Unit) (:features :js-ffi)
+        'dispatch-event! $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn dispatch-event! (op)
+            hint-fn $ Fn AnyEnum (-> Unit) (:features :js-ffi)
+            dispatch! $ decode-dispatch op
+          :examples $ []
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -240,7 +245,7 @@
               (:none) &unit
             render-app!
             add-watch! *reel :changes $ fn (r p) (render-app!)
-            listen-devtools! |a dispatch!
+            listen-devtools! |a dispatch-event!
             add-event-listener! |beforeunload $ fn (_) (persist-storage!)
             add-event-listener! |keydown on-window-keydown
             set-interval! persist-storage! 60000
@@ -303,9 +308,7 @@
           :code $ quote $ defn render-app! ()
             render-with! (mount-target)
               fn () $ comp-container @*reel
-              fn (op)
-                hint-fn $ Fn Enum $ -> Unit
-                dispatch! op
+              , dispatch-event!
           :examples $ []
           :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
       :ns $ %{} 'NsEntry (:doc |)

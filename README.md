@@ -4,14 +4,14 @@
 
 ## 使用者需要注意
 
-配对正式 **Calcit / @calcit/procs 0.35.1**、Caps 0.1.1、Node 24.15.0 或更新的 24.x 和 Yarn 4.18.0。正式模块统一为 Markdown 0.8.1、Feather 0.6.2、Reel 0.9.2、Respo 0.19.4、UI 0.15.1、JS FFI 0.2.13，传递 Router 0.12.1。升级后严格重装完整图、生成 JS 并刷新，不混用旧 runtime。
+配对正式 **Calcit / @calcit/procs 0.37.0**、Caps 0.1.1、Node 24.15.0 或更新的 24.x 和 Yarn 4.18.0。正式模块统一为 Markdown 0.8.2、Feather 0.6.3、Reel 0.10.0、Respo 0.19.5、UI 0.15.2、JS FFI 0.2.13，传递 Router 0.12.2。升级后严格重装完整图、生成 JS 并刷新，不混用旧 runtime。
 
 原 Markdown 内容、预览切换、高亮语言、朗读策略、`markdown-editor` 存储键和部署路径保持。Store/Op 模型与 wire 恢复、合法本地 Store 的对象身份保持。启动仍先读取、解析、解码、hydrate 和首次渲染，再注册退出及定时保存；失败中止启动并保留原存档，不自动默认覆盖。坏存档可见提示仍单独跟踪于 [#68](https://github.com/Memkits/markdown-editor/issues/68)，本轮不宣称完成此界面需求。真实 JS `hud!` 成功/编译错误提示保留。
 
 ## 本次迁移与风险
 
 - 输入及点击回调使用实际 `RespoEvent`，输入值仍通过原 String 解码检查。预览模式下的缺席 textarea 使用 Option，浏览器根及原 HTML 回归在 managed memo frame 内构建/渲染。
-- 派发入口接收 AnyEnum，继续优先解码 Reel 控制，再将业务事件解码为具名 Op。内部按 `ResolvedOp = Op | reel.typed/Control` 穷尽匹配。状态路径使用 Respo 的 CoordKey union，开放的状态载荷和存档输入继续受检。
+- Respo 和 Reel 开发工具的共享入口先解码外部事件，再将 `ResolvedOp = Op | reel.typed/Control` 交给内部派发。编辑器的输入和预览回调直接使用具名 `Op`。状态路径使用 Respo 的 CoordKey union，开放的状态载荷和存档输入继续受检。
 - 现有两个 Highlight.js external-object trait 通过 `js-cast` 检查所需方法，替代原 unsafe；合法导入行为不变，不合法宿主会更早失败。该检查只证明浅层成员存在/可调用，不证明语言插件或方法结果的深层合同。
 原两项 Node 业务回归保留输入和断言，仅同步 RespoEvent 身份与帧入口，继续覆盖高亮、混合 cursor、存储往返和离线朗读。没有附带 native 测试，不把空集合记为通过。朗读实现不改；离线夹具不等同真实语音服务验收，本轮不点击浏览器朗读、不配置密钥、不请求 Azure。
 
@@ -29,7 +29,7 @@ yarn build
 node --test tests/*.test.mjs
 ```
 
-本地通过 349 个全定义、五个应用 namespace 的全部 33 个定义、完整 strict diagnostics=[]、零 deprecated/dynamic-method、canonical、严格模块图/工具链、immutable 安装、原两项 Node 回归及构建。新 npm 解析保留原 60 分钟包龄策略，无单包豁免；原 SDK chunk >500kB 提示保留。
+CI 检查全部定义、五个应用 namespace、完整 strict、旧调用、规范格式、严格模块图和工具链，并执行 immutable 安装、前端构建及原两项 Node 回归。新 npm 解析保留原 60 分钟包龄策略，无单包豁免；原 SDK chunk >500kB 提示保留。
 
 此前在全新回环来源用独立 Chrome 验证中英文/emoji、JavaScript 关键字高亮、预览图标、⌘E、内容和预览状态刷新恢复、Reel Reset，页面异常及 console warn/error 均为空。仅使用合成 Markdown 和该新来源的自动存档，不读取真实文件/存档，不操作剪贴板，不调用真实语音。启动/坏存档保护代码、HUD 和 HMR 实现未改；本轮未重新注入坏存档或编译错误验收。
 
