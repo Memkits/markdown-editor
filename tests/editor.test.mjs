@@ -93,8 +93,14 @@ test("actual dispatch/save/hydrate and DOM reading preserve the original boundar
     removeItem(key) { writes.delete(key); },
     clear() { writes.clear(); },
   };
-  main.dispatch_$x_(op("content", content));
+  const events = c.init_tags(["content", "reel/toggle", "display?", "records"]);
+  main.dispatch_event_$x_(c._$o__$o_(events.content, content));
   main.dispatch_$x_(op("toggle"));
+  const beforeControl = c.deref(main._$s_reel);
+  main.dispatch_event_$x_(c._$o__$o_(events["reel/toggle"]));
+  const afterControl = c.deref(main._$s_reel);
+  assert.equal(read(afterControl, events["display?"]), !read(beforeControl, events["display?"]));
+  assert.equal(read(afterControl, events.records), read(beforeControl, events.records));
   main.persist_storage_$x_();
   assert.equal(writes.size, 1);
   const saved = invoke_method("unwrap", decode_store(c.parse_cirru_edn(writes.get("markdown-editor"))));
