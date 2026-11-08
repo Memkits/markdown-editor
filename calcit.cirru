@@ -203,25 +203,21 @@
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :register-language! |registerLanguage
           :schema $ quote Trait
-        'decode-dispatch $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn decode-dispatch (op)
-            match (typed/decode-control op)
-              (:some control) control
-              (:none) (schema/decode-op op)
-          :examples $ []
-          :schema $ quote $ Fn AnyEnum (-> app.schema/ResolvedOp)
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
             when config/dev? $ println |Dispatch: op
-            reset! *reel $ next-reel op
+            reset! *reel $ match op
+              (reel.typed/Control control) (typed/apply-control updater @*reel control)
+              (app.schema/Op action)
+                typed/record-op updater @*reel action (generate-id!) (now-ms)
             , &unit
           :examples $ []
           :schema $ quote $ Fn app.schema/ResolvedOp (-> Unit) (:features :js-ffi)
         'dispatch-event! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch-event! (op)
-            hint-fn $ Fn AnyEnum (-> Unit) (:features :js-ffi)
-            dispatch! $ decode-dispatch op
+            dispatch! $ schema/decode-op op
           :examples $ []
+          :schema $ quote $ Fn AnyEnum (-> Unit) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -245,7 +241,7 @@
               (:none) &unit
             render-app!
             add-watch! *reel :changes $ fn (r p) (render-app!)
-            listen-devtools! |a dispatch-event!
+            listen-devtools-toggle! |a $ fn () $ dispatch! (reel.typed/Control :toggle)
             add-event-listener! |beforeunload $ fn (_) (persist-storage!)
             add-event-listener! |keydown on-window-keydown
             set-interval! persist-storage! 60000
@@ -257,16 +253,6 @@
             narrow-element $ .unwrap $ query-selector |.app
           :examples $ []
           :schema $ quote $ Fn (-> respo.dom/DomElement) (:features :js-ffi)
-        'next-reel $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn next-reel (op)
-            match op
-              (reel.typed/Control control) (typed/apply-control updater @*reel control)
-              (app.schema/Op action)
-                typed/record-op updater @*reel action (generate-id!) (now-ms)
-          :examples $ []
-          :schema $ quote $ Fn app.schema/ResolvedOp
-            -> $ reel.typed/State app.schema/Op app.schema/Store
-            :features :js-ffi
         'on-window-keydown $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-window-keydown (event)
             let
@@ -318,7 +304,7 @@
             app.comp.container :refer $ comp-container
             app.updater :refer $ updater
             app.schema :as schema
-            reel.util :refer $ listen-devtools!
+            reel.util :refer $ listen-devtools-toggle!
             app.config :as config
             |highlight.js/lib/core :default hljs
             |highlight.js/lib/languages/clojure :default clojure-lang
@@ -361,26 +347,29 @@
           :schema $ quote StructDef
         'decode-op $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn decode-op (op)
-            match op
-              (:states cursor state)
-                Op :states
-                  decode-map-as cursor $ List respo.schema/CoordKey
-                  , state
-              (:content content)
-                Op :content $ decode-map-as content 'String
-              (:hydrate-storage data)
-                Op :hydrate-storage $ .unwrap $ decode-store data
-              (:toggle) (Op :toggle)
-              _ $ raise |Invalid-business-operation
+            match (typed/decode-control op)
+              (:some control) control
+              (:none)
+                match op
+                  (:states cursor state)
+                    Op :states
+                      decode-map-as cursor $ List respo.schema/CoordKey
+                      , state
+                  (:content content)
+                    Op :content $ decode-map-as content 'String
+                  (:hydrate-storage data)
+                    Op :hydrate-storage $ .unwrap $ decode-store data
+                  (:toggle) (Op :toggle)
+                  _ $ raise |Invalid-business-operation
           :examples $ []
-          :schema $ quote $ Fn AnyEnum (-> app.schema/Op)
+          :schema $ quote $ Fn AnyEnum (-> app.schema/ResolvedOp)
         'decode-store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn decode-store (data)
             if (struct? data)
               match
                 try-decode-map-as (&struct:to-map data) Store
                 (:ok checked)
-                  Option :some $ if (&struct:matches? data Store) (assert-type data 'app.schema/Store) checked
+                  Option :some $ struct-match data (Store nominal nominal) (_ original checked)
                 (:err _) (Option :none)
               match (try-decode-map-as data Store)
                 (:ok stored) (Option :some stored)
@@ -395,6 +384,7 @@
           :schema $ quote app.schema/Store
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.schema
+          :require $ reel.typed :as typed
     'app.updater $ %{} 'FileEntry
       :defs $ {} $ 'updater
         %{} 'CodeEntry (:doc |)
