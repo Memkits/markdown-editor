@@ -6,7 +6,7 @@ import { invoke_method } from "@calcit/procs";
 import * as c from "../js-out/calcit.core.mjs";
 import { store, Op, decode_store } from "../js-out/app.schema.mjs";
 import { updater } from "../js-out/app.updater.mjs";
-import { new_reel } from "../js-out/reel.typed.mjs";
+import { Control, new_reel } from "../js-out/reel.typed.mjs";
 import { make_string } from "../js-out/respo.render.html.mjs";
 import { with_memo_frame } from "../js-out/respo.memo.mjs";
 import { RespoEvent } from "../js-out/respo.schema.mjs";
@@ -69,13 +69,14 @@ test("actual input RespoEvent, Markdown rendering and mixed UI cursor retain con
   let edited = store;
   const event = event__GT_edn({ type: "input", target: { value: content, checked: false } });
   assert.ok(c._$n_struct_$o_matches_$q_(event, RespoEvent));
-  with_memo_frame(() => inputHandler(app.comp_container(new_reel(store))))(event, (operation) => {
+  const onControl = () => assert.fail("Editor input must use application dispatch");
+  with_memo_frame(() => inputHandler(app.comp_container(new_reel(store), onControl)))(event, (operation) => {
     edited = updater(edited, operation, "fixture", 1);
   });
   const next = updater(edited, op("states", c._$L_(t.editor, 2), "draft"), "fixture2", 2);
   assert.equal(read(next, t.content), content);
   assert.equal(read(read(read(read(next, t.states), t.editor), 2), t.data), "draft");
-  const html = with_memo_frame(() => make_string(app.comp_container(new_reel(next))));
+  const html = with_memo_frame(() => make_string(app.comp_container(new_reel(next), onControl)));
   assert.ok(html.includes("Editor fixture"));
   assert.ok(html.includes("hljs-keyword"));
   assert.equal(app.highlight_code("<unknown>&", "unknown-language"), "&lt;unknown&gt;&amp;");
@@ -93,11 +94,11 @@ test("actual dispatch/save/hydrate and DOM reading preserve the original boundar
     removeItem(key) { writes.delete(key); },
     clear() { writes.clear(); },
   };
-  const events = c.init_tags(["content", "reel/toggle", "display?", "records"]);
-  main.dispatch_event_$x_(c._$o__$o_(events.content, content));
+  const events = c.init_tags(["toggle", "display?", "records"]);
+  main.dispatch_event_$x_(op("content", content));
   main.dispatch_$x_(op("toggle"));
   const beforeControl = c.deref(main._$s_reel);
-  main.dispatch_event_$x_(c._$o__$o_(events["reel/toggle"]));
+  main.on_control_$x_(c._PCT__$o__$o_(Control, events.toggle));
   const afterControl = c.deref(main._$s_reel);
   assert.equal(read(afterControl, events["display?"]), !read(beforeControl, events["display?"]));
   assert.equal(read(afterControl, events.records), read(beforeControl, events.records));
