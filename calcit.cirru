@@ -12,10 +12,15 @@
       :defs $ {}
         'HighlightHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait HighlightHost
-            .highlight $ Fn app.comp.container/HighlightHost String JsObject $ -> app.comp.container/HighlightResultHost
+            .highlight $ Fn app.comp.container/HighlightHost String app.comp.container/HighlightOptionsHost $ -> app.comp.container/HighlightResultHost
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :highlight |highlight
+          :schema $ quote Trait
+        'HighlightOptionsHost $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ deftrait HighlightOptionsHost (:language 'String)
+          :examples $ []
+          :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
           :schema $ quote Trait
         'HighlightResultHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait HighlightResultHost (:value 'String)
@@ -125,8 +130,10 @@
             if (contains? supported-langs lang)
               let
                   host $ js-cast hljs 'app.comp.container/HighlightHost
-                  result $ .highlight host code $ js-object
-                    :language $ .unwrap $ get supported-langs lang
+                  options $ js-cast
+                    js-object $ :language $ .unwrap (get supported-langs lang)
+                    quote app.comp.container/HighlightOptionsHost
+                  result $ .highlight host code options
                 result :value
               contract/expect-string |escaped-code $ escape-html code
           :examples $ []
