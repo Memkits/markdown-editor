@@ -69,7 +69,7 @@
                         hint-fn $ Fn String String $ -> String
                         highlight-code code lang
                 if (not preview?)
-                  Option :some $ textarea $ {} (:class-name css-textbox)
+                  Some $ textarea $ {} (:class-name css-textbox)
                     :value $ :content store
                     :placeholder "|Markdown syntax supported~"
                     :on-input $ fn (e d!)
@@ -78,7 +78,7 @@
                         -> Unit
                       d! $ Op :content $ decode-map-as (:value e) 'String
                     :autofocus true
-                  Option :none
+                  , None
                 div ({})
                   div
                     {} $ :style $ {} (:position :fixed) (:top 0) (:right 0)
@@ -106,7 +106,7 @@
                       comp-i :github 14 $ hsl 200 80 80
                 comp-typed-reel (>> states :reel) reel ({}) on-control
           :examples $ []
-          :schema $ quote $ Fn (reel.typed/State app.schema/Op app.schema/Store)
+          :schema $ quote $ Fn (reel.typed/State Op app.schema/Store)
             Fn reel.typed/Control $ -> Unit
             -> respo.schema/Component
             :features :js-ffi
@@ -205,7 +205,7 @@
         '*reel $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *reel (typed/new-reel schema/store)
           :examples $ []
-          :schema $ quote $ Ref (reel.typed/State app.schema/Op app.schema/Store)
+          :schema $ quote $ Ref (typed/State schema/Op schema/Store)
         'HighlightHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait HighlightHost
             .register-language! $ Fn app.main/HighlightHost String JsObject $ -> Unit
@@ -222,11 +222,11 @@
                 typed/record-op updater @*reel action (generate-id!) (now-ms)
             , &unit
           :examples $ []
-          :schema $ quote $ Fn app.schema/ResolvedOp (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn schema/ResolvedOp (-> Unit) (:features :js-ffi)
         'dispatch-event! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch-event! (op) (dispatch! op)
           :examples $ []
-          :schema $ quote $ Fn app.schema/Op (-> Unit)
+          :schema $ quote $ Fn schema/Op (-> Unit)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -265,7 +265,7 @@
         'on-control! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-control! (control) (dispatch! control)
           :examples $ []
-          :schema $ quote $ Fn reel.typed/Control (-> Unit)
+          :schema $ quote $ Fn typed/Control (-> Unit)
         'on-window-keydown $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-window-keydown (event)
             let
@@ -337,7 +337,7 @@
       :defs $ {}
         'Op $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defenum Op
-            :states (List respo.schema/CoordKey) Dynamic
+            :states (List respo.schema/CoordKey) String
             :content String
             :hydrate-storage app.schema/Store
             :toggle
@@ -360,19 +360,20 @@
               match
                 try-decode-map-as (&struct:to-map data) Store
                 (:ok checked)
-                  Option :some $ struct-match data (Store nominal nominal) (_ original checked)
-                (:err _) (Option :none)
+                  Some $ struct-match data (Store nominal nominal) (_ original checked)
+                (:err _) None
               match (try-decode-map-as data Store)
-                (:ok stored) (Option :some stored)
-                (:err _) (Option :none)
+                (:ok stored) (Some stored)
+                (:err _) None
           :examples $ []
-          :schema $ quote $ Fn Dynamic
-            -> $ Option app.schema/Store
+          :schema $ quote $ Fn Input
+            -> $ Option Store
+            :generics Input
         'store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def store
             Store :states ({}) :content | :preview? false
           :examples $ []
-          :schema $ quote app.schema/Store
+          :schema $ quote Store
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.schema
     'app.updater $ %{} 'FileEntry
