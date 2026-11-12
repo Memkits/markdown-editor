@@ -74,7 +74,7 @@
                     :placeholder "|Markdown syntax supported~"
                     :on-input $ fn (e d!)
                       hint-fn $ Fn respo.schema/RespoEvent
-                        Fn app.schema/Op $ -> Unit
+                        Fn Op $ -> Unit
                         -> Unit
                       d! $ Op :content $ decode-map-as (:value e) 'String
                     :autofocus true
@@ -86,7 +86,7 @@
                       {} (:class-name css-icon)
                         :on-click $ fn (e d!)
                           hint-fn $ Fn respo.schema/RespoEvent
-                            Fn app.schema/Op $ -> Unit
+                            Fn Op $ -> Unit
                             -> Unit
                           d! $ Op :toggle
                       comp-i :film 14 $ hsl 200 80 80
@@ -94,7 +94,7 @@
                       {} (:class-name css-icon)
                         :on-click $ fn (e d!)
                           hint-fn $ Fn respo.schema/RespoEvent
-                            Fn app.schema/Op $ -> Unit
+                            Fn Op $ -> Unit
                             -> Unit
                           read-from-dom!
                       comp-i :volume-2 14 $ hsl 200 80 80
