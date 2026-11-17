@@ -107,9 +107,9 @@
                 comp-typed-reel (>> states :reel) reel ({}) on-control
           :examples $ []
           :schema $ quote $ Fn (reel.typed/State Op app.schema/Store)
-            Fn reel.typed/Control $ -> Unit
+            Fn reel.typed/Control (-> Unit) (:features :io :state)
             -> respo.schema/Component
-            :features :io :js-ffi
+            :features :io :js-ffi :state
         'css-icon $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-icon
             {} $ |$0 $ .merge ui/center
@@ -252,7 +252,7 @@
             add-watch! *reel :changes $ fn (r p) (render-app!)
             listen-devtools! |a on-control!
             add-event-listener! |beforeunload $ fn (_) (persist-storage!)
-            add-event-listener! |keydown on-window-keydown
+            add-event-listener! |keydown $ fn (e) (on-window-keydown e)
             set-interval! persist-storage! 60000
             println "|App started."
           :examples $ []
