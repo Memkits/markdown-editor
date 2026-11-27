@@ -123,7 +123,7 @@ jobs:
     - name: Upload and verify static assets on COS
       if: steps.cos-credentials.outputs.available == 'true'
       timeout-minutes: 10
-      uses: worktools/cos-upload-action@v1.2.0
+      uses: worktools/cos-upload-action@v1.3.0
       with:
         source-dir: dist
         bucket: ${{ secrets.COS_BUCKET }}
