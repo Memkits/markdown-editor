@@ -4,7 +4,7 @@
 
 ## 使用者需要注意
 
-配对正式 **Calcit / @calcit/procs 0.46.0**、Caps 0.1.2、Node 24.15.0 或更新的 24.x 和 Yarn 4.18.0。`deps.cirru` 声明 Markdown 0.9.10、Feather 0.6.14、Reel 0.11.10、Respo 0.20.0、UI 0.16.6 和 JS FFI 0.2.26；传递依赖以严格解析的模块图为准。升级后严格重装完整图、生成 JS 并刷新，不混用旧 runtime。
+配对正式 **Calcit / @calcit/procs 0.47.1**、Caps 0.1.2、Node 24.15.0 或更新的 24.x 和 Yarn 4.18.0。`deps.cirru` 声明 Markdown 0.9.11、Feather 0.6.15、Reel 0.11.11、Respo 0.20.1、UI 0.16.7 和 JS FFI 0.2.26；传递依赖以严格解析的模块图为准。升级后严格重装完整图、生成 JS 并刷新，不混用旧 runtime。
 
 原 Markdown 内容、预览切换、高亮语言、朗读策略、`markdown-editor` 存储键和部署路径保持。Store/Op 模型与 wire 恢复、合法本地 Store 的对象身份保持。启动仍先读取、解析、解码、hydrate 和首次渲染，再注册退出及定时保存；失败中止启动并保留原存档，不自动默认覆盖。坏存档可见提示仍单独跟踪于 [#68](https://github.com/Memkits/markdown-editor/issues/68)，本轮不宣称完成此界面需求。真实 JS `hud!` 成功/编译错误提示保留。
 
